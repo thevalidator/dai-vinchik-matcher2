@@ -1,4 +1,4 @@
-package ru.thevalidator.daivinchikmatcher2.vk.longpoll;
+package ru.thevalidator.daivinchikmatcher2.vk.task.longpoll;
 
 import com.vk.api.sdk.client.ClientResponse;
 import com.vk.api.sdk.client.VkApiClient;
@@ -13,10 +13,11 @@ import ru.thevalidator.daivinchikmatcher2.config.settings.Settings;
 import ru.thevalidator.daivinchikmatcher2.util.data.SerializerUtil;
 import ru.thevalidator.daivinchikmatcher2.vk.custom.actor.CustomUserActor;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.LongPollServerResponse;
+import ru.thevalidator.daivinchikmatcher2.vk.task.Task;
 
 import java.io.IOException;
 
-public class UserLongPollSpectatorService implements Runnable {
+public class UserLongPollSpectatorService implements Task {
     private static final int WAIT_TIME = Settings.INSTANCE.getLongPollWaitTime();
     private static final int LP_VERSION = Settings.INSTANCE.getLongPollVersion();
     private static final Logger LOG = LoggerFactory.getLogger(UserLongPollSpectatorService.class);
@@ -97,9 +98,9 @@ public class UserLongPollSpectatorService implements Runnable {
         return vk.messages().getLongPollServer(actor).lpVersion(LP_VERSION).execute();
     }
 
-    public void deactivate() {
+    @Override
+    public void stop() {
         isActive = false;
         LOG.debug("DEACTIVATE METHOD INVOKED");
     }
-
 }
