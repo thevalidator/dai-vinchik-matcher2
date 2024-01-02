@@ -11,8 +11,8 @@ public class SerializerUtil {
         return mapper.readValue(response, LongPollServerResponse.class);
     }
 
-//    public static ObjectMapper getMapper() {
-//        return mapper;
-//    }
+    public static ObjectMapper getMapper() {
+        return mapper;
+    }
 
 }
