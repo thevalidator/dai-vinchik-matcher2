@@ -12,5 +12,6 @@
         </Root>
         <Logger name="ru.thevalidator.daivinchikmatcher2.vk.longpoll" level="debug"/>
         <Logger name="ru.thevalidator.daivinchikmatcher2.transport" level="debug"/>
+        <Logger name="ru.thevalidator.daivinchikmatcher2.vk.task.request" level="debug"/>
     </Loggers>
 </Configuration>
