@@ -1,11 +1,18 @@
 # DAI VINCHIK MATCHER 2
----
-Приложение для автоматизированного поиска людей в боте Дайвинчик для ВК.
+
+Приложение для автоматизированного поиска в боте Дайвинчик для ВК.
 
 
-- [ ] add VK lib
-- [ ] feature 2
+- [x] ~~add VK lib~~
+- [x] ~~add logging~~
+- [x] ~~add long poll spectator~~
+- [ ] set userID in custom actor after connect
 - [ ] feature 3
+- [ ] feature 3
+- [ ] feature 3
+- [ ] feature 3
+- [ ] feature 1
+- [ ] feature 1
 - [ ] feature 1
 - [ ] feature 2
 - [ ] feature 3
