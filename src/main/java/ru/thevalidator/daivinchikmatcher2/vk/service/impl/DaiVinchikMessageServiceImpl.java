@@ -5,15 +5,17 @@ import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.UserActor;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
-import com.vk.api.sdk.objects.messages.GetHistoryRev;
-import com.vk.api.sdk.objects.messages.responses.GetHistoryResponse;
+import com.vk.api.sdk.objects.messages.Message;
+import com.vk.api.sdk.objects.messages.responses.GetByIdResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.thevalidator.daivinchikmatcher2.config.settings.Settings;
 import ru.thevalidator.daivinchikmatcher2.util.data.SerializerUtil;
+import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageWithKeyboard;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.GetConversationsByIdResponse;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.Response;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.Conversation;
+import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keyboard.Keyboard;
 import ru.thevalidator.daivinchikmatcher2.vk.service.DaiVinchikMessageService;
 
 public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
@@ -28,15 +30,23 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
     }
 
     @Override
-    public Conversation getDaiVinchikConversation() {
-        var query = vk.messages().getConversationsById(actor, Settings.INSTANCE.getDaiVinchickPeerId());
+    public MessageWithKeyboard getDaiVinchikLastMessage() {
+        Conversation c = getDaiVinchikConversation();
+        Keyboard keyboard = c.getCurrentKeyboard();
+        Message message = getMessageById(c.getLastMessageId());
+        return new MessageWithKeyboard(message, keyboard);
+    }
+
+    private Conversation getDaiVinchikConversation() {
         try {
-            String json = query
+            String json = vk.messages()
+                    .getConversationsById(actor, Settings.INSTANCE.getDaiVinchickPeerId())
                     .executeAsRaw()
                     .getJson()
                     .getAsString();
-            LOG.debug("Receive conversation by id response: {}", json);
+            LOG.debug("Receive conversations by id response: {}", json);
             GetConversationsByIdResponse rs = SerializerUtil.getMapper().readValue(json, Response.class).getResponse();
+            //@TODO: extract method for checking
             if (rs.getCount() > 1) {
                 throw new IllegalArgumentException("Count=" + rs.getCount() + ", but should be 1");
             }
@@ -44,26 +54,25 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
         } catch (ClientException | JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+        //@TODO: handle all exceptions and errors: https://dev.vk.com/ru/method/messages.getConversationsById
     }
 
-    @Override
-    public GetHistoryResponse getDaiVinchikMessageHistoryResponse(Integer fromMessageId, Integer messagesCount, Integer offset) {
-        LOG.debug("Send history request get {} last messages", messagesCount);
+    private Message getMessageById(Integer lastMessageId) {
         try {
-            GetHistoryResponse rs = vk.messages().getHistory(actor)
-                    .startMessageId(fromMessageId)
-                    .offset(offset)
-                    .count(messagesCount)
-                    //.userId(Settings.INSTANCE.getDaiVinchickPeerId())
-                    .peerId(Settings.INSTANCE.getDaiVinchickPeerId())
-                    //.extended(true)
-                    .rev(GetHistoryRev.REVERSE_CHRONOLOGICAL)
+            GetByIdResponse rs = vk.messages()
+                    .getById(actor)
+                    .messageIds(lastMessageId)
                     .execute();
-            LOG.debug("Receive history response: {}", rs.toString());
-            return rs;
-        } catch (ClientException | ApiException e) {
+            LOG.debug("Receive messages by id response: {}", rs.toString());
+            //@TODO: extract method for checking
+            if (rs.getCount() > 1) {
+                throw new IllegalArgumentException("Count=" + rs.getCount() + ", but should be 1");
+            }
+            return rs.getItems().get(0);
+        } catch (ApiException | ClientException e) {
             throw new RuntimeException(e);
         }
-        //@TODO: handle all exceptions and errors: https://dev.vk.com/ru/method/messages.getHistory
+        //@TODO: handle all exceptions and errors: https://dev.vk.com/ru/method/messages.getById
     }
+
 }
