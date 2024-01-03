@@ -7,10 +7,10 @@ import ru.thevalidator.daivinchikmatcher2.account.UserAccount;
 import ru.thevalidator.daivinchikmatcher2.task.Task;
 import ru.thevalidator.daivinchikmatcher2.vk.custom.actor.CustomUserActor;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageWithKeyboard;
-import ru.thevalidator.daivinchikmatcher2.vk.service.CaseMatcher;
-import ru.thevalidator.daivinchikmatcher2.vk.service.DaiVinchikMessageService;
-import ru.thevalidator.daivinchikmatcher2.vk.service.impl.CaseMatcherImpl;
-import ru.thevalidator.daivinchikmatcher2.vk.service.impl.DaiVinchikMessageServiceImpl;
+import ru.thevalidator.daivinchikmatcher2.service.CaseMatcher;
+import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMessageService;
+import ru.thevalidator.daivinchikmatcher2.service.impl.CaseMatcherImpl;
+import ru.thevalidator.daivinchikmatcher2.service.impl.DaiVinchikMessageServiceImpl;
 
 public class DaiVinchikDialogHandler implements Task {
     private static final Logger LOG = LoggerFactory.getLogger(DaiVinchikDialogHandler.class);

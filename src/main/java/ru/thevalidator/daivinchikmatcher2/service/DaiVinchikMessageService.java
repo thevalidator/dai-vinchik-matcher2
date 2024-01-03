@@ -1,4 +1,4 @@
-package ru.thevalidator.daivinchikmatcher2.vk.service;
+package ru.thevalidator.daivinchikmatcher2.service;
 
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageWithKeyboard;
 

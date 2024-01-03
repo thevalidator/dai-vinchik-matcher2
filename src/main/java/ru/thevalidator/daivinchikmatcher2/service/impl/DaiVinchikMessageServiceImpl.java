@@ -1,4 +1,4 @@
-package ru.thevalidator.daivinchikmatcher2.vk.service.impl;
+package ru.thevalidator.daivinchikmatcher2.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vk.api.sdk.client.VkApiClient;
@@ -10,13 +10,13 @@ import com.vk.api.sdk.objects.messages.responses.GetByIdResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.thevalidator.daivinchikmatcher2.config.settings.Settings;
+import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMessageService;
 import ru.thevalidator.daivinchikmatcher2.util.data.SerializerUtil;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageWithKeyboard;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.GetConversationsByIdResponse;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.Response;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.Conversation;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keyboard.Keyboard;
-import ru.thevalidator.daivinchikmatcher2.vk.service.DaiVinchikMessageService;
 
 public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
 
