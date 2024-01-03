@@ -1,4 +1,4 @@
-package ru.thevalidator.daivinchikmatcher2.config.settings;
+package ru.thevalidator.daivinchikmatcher2.config.settings.options;
 
 public interface BaseSettings {
     public void setLongPollWaitTime(Integer delayInSeconds);

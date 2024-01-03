@@ -1,4 +1,4 @@
-package ru.thevalidator.daivinchikmatcher2.vk.task.request;
+package ru.thevalidator.daivinchikmatcher2.task.request;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vk.api.sdk.client.VkApiClient;
@@ -16,13 +16,13 @@ import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.GetConversationsBy
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.Response;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.Conversation;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keyboard.Keyboard;
-import ru.thevalidator.daivinchikmatcher2.vk.task.Task;
+import ru.thevalidator.daivinchikmatcher2.task.Task;
 
 import java.util.Objects;
 
 public class DaiVinchikMessageHandler implements Task {
     private static final Logger LOG = LoggerFactory.getLogger(DaiVinchikMessageHandler.class);
-    private static final Integer LAST_MESSAGES_NUMBER = 5;
+    private static final Integer LAST_MESSAGES_COUNT = 5;
     private final VkApiClient vk;
     private final UserAccount account;
     private final CustomUserActor actor;
@@ -37,31 +37,33 @@ public class DaiVinchikMessageHandler implements Task {
     public void run() {
         GetConversationsByIdResponse crs = getConversationsByIdResponse(Settings.INSTANCE.getDaiVinchickPeerId());
         Conversation c = crs.getItems().get(0);
-
         Integer lastMessageId = c.getLastMessageId();
         Keyboard keyboard = c.getCurrentKeyboard();
 
-        GetHistoryResponse hrs = getHistoryResponse(LAST_MESSAGES_NUMBER, 0);
-        LOG.debug("Receive {} last messages", hrs.getItems().size());
-        LOG.debug(hrs.toString());
+        GetHistoryResponse hrs = getHistoryResponse(lastMessageId, LAST_MESSAGES_COUNT, 0);
         for (Message m: hrs.getItems()) {
             if (Objects.equals(m.getFromId(), Settings.INSTANCE.getDaiVinchickPeerId())) {
-                System.out.println(">>>>\t" + m.getText());
+                //System.out.println(">>>>\t" + m.getText());
+                LOG.info("Message: {}", m.getText());
             }
         }
     }
 
-    private GetHistoryResponse getHistoryResponse(Integer lastMessagesNumber, Integer offset) {
+    private GetHistoryResponse getHistoryResponse(Integer fromMessageId, Integer messagesCount, Integer offset) {
+        LOG.debug("Request history {} last messages",messagesCount);
         try {
-            return vk.messages().getHistory(actor)
+            GetHistoryResponse rs = vk.messages().getHistory(actor)
+                    .startMessageId(fromMessageId)
                     .offset(offset)
-                    .count(lastMessagesNumber)
+                    .count(messagesCount)
                     .userId(Settings.INSTANCE.getDaiVinchickPeerId())
                     //.peerId(519324877L)
-                    //.peerId(Settings.INSTANCE.getDaiVinchickPeer())
+                    .peerId(Settings.INSTANCE.getDaiVinchickPeerId())
                     //.extended(true)
                     .rev(GetHistoryRev.REVERSE_CHRONOLOGICAL)
                     .execute();
+            LOG.debug("Receive history response: {}", rs.toString());
+            return rs;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -74,7 +76,7 @@ public class DaiVinchikMessageHandler implements Task {
                     .executeAsRaw()
                     .getJson()
                     .getAsString();
-
+            LOG.debug("Receive conversation by id response: {}", json);
             return SerializerUtil.getMapper().readValue(json, Response.class).getResponse();
         } catch (ClientException | JsonProcessingException e) {
             throw new RuntimeException(e);

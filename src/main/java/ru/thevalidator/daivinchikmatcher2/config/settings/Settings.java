@@ -1,5 +1,8 @@
 package ru.thevalidator.daivinchikmatcher2.config.settings;
 
+import ru.thevalidator.daivinchikmatcher2.config.settings.options.BaseSettings;
+import ru.thevalidator.daivinchikmatcher2.config.settings.options.UserSettings;
+
 import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
