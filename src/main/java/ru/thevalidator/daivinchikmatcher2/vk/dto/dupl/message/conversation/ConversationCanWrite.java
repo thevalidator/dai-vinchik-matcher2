@@ -24,4 +24,12 @@ public class ConversationCanWrite {
     public void setReason(Integer reason) {
         this.reason = reason;
     }
+
+    @Override
+    public String toString() {
+        return "ConversationCanWrite{" +
+                "allowed=" + allowed +
+                ", reason=" + reason +
+                '}';
+    }
 }

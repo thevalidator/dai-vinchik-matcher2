@@ -25,4 +25,12 @@ public class ConversationSortId {
     public void setMinorId(Integer minorId) {
         this.minorId = minorId;
     }
+
+    @Override
+    public String toString() {
+        return "ConversationSortId{" +
+                "majorId=" + majorId +
+                ", minorId=" + minorId +
+                '}';
+    }
 }

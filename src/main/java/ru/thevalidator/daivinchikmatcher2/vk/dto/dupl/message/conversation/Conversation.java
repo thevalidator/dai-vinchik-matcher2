@@ -141,4 +141,22 @@ public class Conversation {
     public void setUnreadCount(Integer unreadCount) {
         this.unreadCount = unreadCount;
     }
+
+    @Override
+    public String toString() {
+        return "Conversation{" +
+                "canWrite=" + canWrite +
+                ", currentKeyboard=" + currentKeyboard +
+                ", important=" + important +
+                ", inRead=" + inRead +
+                ", isMarkedUnread=" + isMarkedUnread +
+                ", lastConversationMessageId=" + lastConversationMessageId +
+                ", lastMessageId=" + lastMessageId +
+                ", mentions=" + mentions +
+                ", outRead=" + outRead +
+                ", sortId=" + sortId +
+                ", unanswered=" + unanswered +
+                ", unreadCount=" + unreadCount +
+                '}';
+    }
 }
