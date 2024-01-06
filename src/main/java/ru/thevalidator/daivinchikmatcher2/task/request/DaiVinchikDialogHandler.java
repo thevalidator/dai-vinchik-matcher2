@@ -13,7 +13,7 @@ import ru.thevalidator.daivinchikmatcher2.service.impl.DaiVinchikMessageServiceI
 import ru.thevalidator.daivinchikmatcher2.task.Task;
 import ru.thevalidator.daivinchikmatcher2.vk.custom.actor.CustomUserActor;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.DaiVinchikDialogAnswer;
-import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageWithKeyboard;
+import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
 
 public class DaiVinchikDialogHandler implements Task {
 
@@ -40,10 +40,11 @@ public class DaiVinchikDialogHandler implements Task {
 
     @Override
     public void run() {
-
-        MessageWithKeyboard msg = messageService.getDaiVinchikLastMessage();
+        LOG.debug("Start task");
+        MessageAndKeyboard msg = messageService.getDaiVinchikLastMessage();
         DaiVinchikDialogAnswer answer = answerService.findAnswer(msg);
-
+        messageService.sendMessage(answer);
+        LOG.debug("Finish task");
     }
 
     @Override
