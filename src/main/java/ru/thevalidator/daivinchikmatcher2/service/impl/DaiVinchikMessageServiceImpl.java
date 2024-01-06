@@ -12,7 +12,8 @@ import org.slf4j.LoggerFactory;
 import ru.thevalidator.daivinchikmatcher2.config.settings.Settings;
 import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMessageService;
 import ru.thevalidator.daivinchikmatcher2.util.data.SerializerUtil;
-import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageWithKeyboard;
+import ru.thevalidator.daivinchikmatcher2.vk.dto.DaiVinchikDialogAnswer;
+import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.GetConversationsByIdResponse;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.Response;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.Conversation;
@@ -30,11 +31,16 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
     }
 
     @Override
-    public MessageWithKeyboard getDaiVinchikLastMessage() {
+    public MessageAndKeyboard getDaiVinchikLastMessage() {
         Conversation c = getDaiVinchikConversation();
         Keyboard keyboard = c.getCurrentKeyboard();
         Message message = getMessageById(c.getLastMessageId());
-        return new MessageWithKeyboard(message, keyboard);
+        return new MessageAndKeyboard(message, keyboard);
+    }
+
+    @Override
+    public void sendMessage(DaiVinchikDialogAnswer answer) {
+        throw new UnsupportedOperationException("Not supported yet");
     }
 
     private Conversation getDaiVinchikConversation() {
