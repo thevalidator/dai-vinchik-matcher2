@@ -1,18 +1,20 @@
 package ru.thevalidator.daivinchikmatcher2.vk.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vk.api.sdk.objects.messages.Message;
 import ru.thevalidator.daivinchikmatcher2.util.data.SerializerUtil;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keyboard.Keyboard;
 
-public class MessageWithKeyboard {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class MessageAndKeyboard {
     private Message message;
     private Keyboard keyboard;
 
-    public MessageWithKeyboard() {
+    public MessageAndKeyboard() {
     }
 
-    public MessageWithKeyboard(Message message, Keyboard keyboard) {
+    public MessageAndKeyboard(Message message, Keyboard keyboard) {
         this.message = message;
         this.keyboard = keyboard;
     }
