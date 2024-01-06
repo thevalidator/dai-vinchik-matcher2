@@ -41,8 +41,10 @@ public class DaiVinchikDialogHandler implements Task {
     @Override
     public void run() {
         LOG.debug("Start task");
-        MessageAndKeyboard msg = messageService.getDaiVinchikLastMessage();
-        DaiVinchikDialogAnswer answer = answerService.findAnswer(msg);
+        MessageAndKeyboard data = messageService.getDaiVinchikLastMessage();
+        LOG.debug("Message with keyboard: {}", data);
+        DaiVinchikDialogAnswer answer = answerService.findAnswer(data);
+        LOG.debug("Dialog answer found: {}", answer);
         messageService.sendMessage(answer);
         LOG.debug("Finish task");
     }

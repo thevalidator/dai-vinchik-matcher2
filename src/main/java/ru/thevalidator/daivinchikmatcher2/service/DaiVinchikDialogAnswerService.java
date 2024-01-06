@@ -5,6 +5,6 @@ import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
 
 public interface DaiVinchikDialogAnswerService {
 
-    public DaiVinchikDialogAnswer findAnswer(MessageAndKeyboard message);
+    public DaiVinchikDialogAnswer findAnswer(MessageAndKeyboard data);
 
 }

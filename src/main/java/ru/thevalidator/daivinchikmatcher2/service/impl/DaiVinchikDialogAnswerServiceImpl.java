@@ -19,8 +19,8 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
     }
 
     @Override
-    public DaiVinchikDialogAnswer findAnswer(MessageAndKeyboard message) {
-        CaseType type = matcher.detectCase(message);
+    public DaiVinchikDialogAnswer findAnswer(MessageAndKeyboard data) {
+        CaseType type = matcher.detectCase(data);
         if (type.equals(CaseType.SKIP_BUTTON)) {
 
         }
