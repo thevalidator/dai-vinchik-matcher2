@@ -1,5 +1,7 @@
 package ru.thevalidator.daivinchikmatcher2.service.impl;
 
+import com.vk.api.sdk.objects.messages.KeyboardButtonActionLocationType;
+import com.vk.api.sdk.objects.messages.KeyboardButtonActionTextType;
 import com.vk.api.sdk.objects.messages.KeyboardButtonColor;
 import com.vk.api.sdk.objects.messages.Message;
 import org.slf4j.Logger;
@@ -30,6 +32,26 @@ public class CaseMatcherImpl implements CaseMatcher {
             type = CaseType.PROFILE;
         }
 
+        else if (isWarning(message)) {
+            type = CaseType.WARNING;
+        }
+
+        else if (isLocation(message)) {
+            type = CaseType.LOCATION;
+        }
+
+        else if (isAdsDV(message)) {
+            type = CaseType.ADS_DV;
+        }
+
+        else if (isAdvice(message)) {
+            type = CaseType.ADVICE;
+        }
+
+        //somebody likes you
+
+        //want to meet
+
         //@TODO: check for captcha
 
 //        if (notAvailableToContinue(message)) {
@@ -57,6 +79,72 @@ public class CaseMatcherImpl implements CaseMatcher {
         return type;
     }
 
+    public boolean isProfile(MessageAndKeyboard data) {
+        Message message = data.getMessage();
+        Keyboard keyboard = data.getKeyboard();
+        List<List<KeyboardButton>> buttonRows = keyboard.getButtons();
+        return buttonRows.size() == 1
+                && buttonRows.get(0).size() == 4
+                && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.POSITIVE.getValue())
+                && buttonRows.get(0).get(3).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && buttonRows.get(0).get(3).getColor().equals(KeyboardButtonColor.DEFAULT.getValue())
+                && message.getText().matches(PROFILE_REGEXP);
+
+    }
+
+    public boolean isWarning(MessageAndKeyboard data) {
+        Message message = data.getMessage();
+        Keyboard keyboard = data.getKeyboard();
+        List<List<KeyboardButton>> buttonRows = keyboard.getButtons();
+        return buttonRows.size() == 1
+                && buttonRows.get(0).size() == 1
+                && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && buttonRows.get(0).get(0).getAction().getLabel().equals("Продолжить просмотр анкет")
+                && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.DEFAULT.getValue());
+    }
+
+    public boolean isLocation(MessageAndKeyboard data) {
+        Keyboard keyboard = data.getKeyboard();
+        List<List<KeyboardButton>> buttonRows = keyboard.getButtons();
+        return buttonRows.size() == 2
+                && buttonRows.get(0).size() == 1
+                && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionLocationType.LOCATION.getValue())
+                && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.DEFAULT.getValue())
+                && buttonRows.get(1).size() == 1
+                && buttonRows.get(1).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && buttonRows.get(1).get(0).getAction().getLabel().equals("Продолжить просмотр анкет")
+                && buttonRows.get(1).get(0).getColor().equals(KeyboardButtonColor.DEFAULT.getValue());
+
+    }
+
+    public boolean isAdsDV(MessageAndKeyboard data) {
+        Message message = data.getMessage();
+        Keyboard keyboard = data.getKeyboard();
+        List<List<KeyboardButton>> buttonRows = keyboard.getButtons();
+        return buttonRows.size() == 1
+                && buttonRows.get(0).size() == 2
+                && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && buttonRows.get(0).get(0).getAction().getLabel().equals("Анкеты в Telegram")
+                && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.POSITIVE.getValue())
+                && buttonRows.get(0).get(1).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && buttonRows.get(0).get(1).getAction().getLabel().equals("Анкеты в VK")
+                && buttonRows.get(0).get(1).getColor().equals(KeyboardButtonColor.DEFAULT.getValue());
+    }
+
+    public boolean isAdvice(MessageAndKeyboard data) {
+        Keyboard keyboard = data.getKeyboard();
+        List<List<KeyboardButton>> buttonRows = keyboard.getButtons();
+        return buttonRows.size() == 1
+                && buttonRows.get(0).size() == 2
+                && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && buttonRows.get(0).get(0).getAction().getLabel().equals("Как это работает?")
+                && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.POSITIVE.getValue())
+                && buttonRows.get(0).get(1).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && buttonRows.get(0).get(1).getAction().getLabel().equals("Хороший совет")
+                && buttonRows.get(0).get(1).getColor().equals(KeyboardButtonColor.DEFAULT.getValue());
+    }
+
     public boolean notAvailableToContinue(MessageAndKeyboard message) {
         throw new UnsupportedOperationException("Not supported yet");
     }
@@ -79,18 +167,6 @@ public class CaseMatcherImpl implements CaseMatcher {
     public boolean hasMessageSkipText(Message message) {
         //if (text.contains("Смотреть анкеты")) {}
         throw new UnsupportedOperationException("Not supported yet");
-    }
-
-    public boolean isProfile(MessageAndKeyboard data) {
-        Message message = data.getMessage();
-        Keyboard keyboard = data.getKeyboard();
-        List<List<KeyboardButton>> buttonRows = keyboard.getButtons();
-        return buttonRows.size() == 1
-                && buttonRows.get(0).size() == 4
-                && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.POSITIVE.getValue())
-                && buttonRows.get(0).get(3).getColor().equals(KeyboardButtonColor.DEFAULT.getValue())
-                && message.getText().matches(PROFILE_REGEXP);
-
     }
 
 //    private boolean isProfileKeyboard(Keyboard keyboard) {
