@@ -15,6 +15,8 @@ import ru.thevalidator.daivinchikmatcher2.vk.custom.actor.CustomUserActor;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.DaiVinchikDialogAnswer;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
 
+import java.util.concurrent.TimeUnit;
+
 public class DaiVinchikDialogHandler implements Task {
 
     private static final Logger LOG = LoggerFactory.getLogger(DaiVinchikDialogHandler.class);
@@ -26,6 +28,7 @@ public class DaiVinchikDialogHandler implements Task {
     private final CaseMatcher matcher;
     private final DaiVinchikDialogAnswerService answerService;
     private final Statistic stats;
+    private boolean isActive;
 
 
     public DaiVinchikDialogHandler(VkApiClient vk, UserAccount account) {
@@ -40,12 +43,21 @@ public class DaiVinchikDialogHandler implements Task {
 
     @Override
     public void run() {
+        isActive = true;
         LOG.debug("Start task");
-        MessageAndKeyboard data = messageService.getDaiVinchikLastMessage();
-        LOG.debug("Message with keyboard: {}", data);
-        DaiVinchikDialogAnswer answer = answerService.findAnswer(data);
-        LOG.debug("Dialog answer found: {}", answer);
-        messageService.sendMessage(answer);
+        while (isActive) {
+            MessageAndKeyboard data = messageService.getDaiVinchikLastMessage();
+            LOG.debug("Message with keyboard: {}", data);
+            DaiVinchikDialogAnswer answer = answerService.findAnswer(data);
+            LOG.debug("Dialog answer found: {}", answer);
+            messageService.sendMessage(answer);
+            try {
+                System.out.println("SLEEPING 12 SECONDS");
+                TimeUnit.SECONDS.sleep(12);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
         LOG.debug("Finish task");
     }
 

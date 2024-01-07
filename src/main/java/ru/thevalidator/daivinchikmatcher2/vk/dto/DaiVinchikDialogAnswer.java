@@ -2,21 +2,28 @@ package ru.thevalidator.daivinchikmatcher2.vk.dto;
 
 public class DaiVinchikDialogAnswer {
 
-    private String answer;
+    private String text;
 
     public DaiVinchikDialogAnswer() {
     }
 
-    public DaiVinchikDialogAnswer(String answer) {
-        this.answer = answer;
+    public DaiVinchikDialogAnswer(String text) {
+        this.text = text;
     }
 
-    public String getAnswer() {
-        return answer;
+    public String getText() {
+        return text;
     }
 
-    public void setAnswer(String answer) {
-        this.answer = answer;
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    @Override
+    public String toString() {
+        return "DaiVinchikDialogAnswer{" +
+                "answer='" + text + '\'' +
+                '}';
     }
 
 }

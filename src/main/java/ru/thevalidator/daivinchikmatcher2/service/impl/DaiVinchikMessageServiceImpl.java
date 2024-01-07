@@ -40,7 +40,20 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
 
     @Override
     public void sendMessage(DaiVinchikDialogAnswer answer) {
-        throw new UnsupportedOperationException("Not supported yet");
+        try {
+            var r = vk.messages().sendUserIds(actor)
+                    .userId(Settings.INSTANCE.getDaiVinchickPeerId())
+                    .randomId(0)
+                    .message(answer.getText())
+                    .executeAsString();
+                    //.execute();
+            //LOG.debug(r.toString());
+            System.out.println(r);
+        } catch (Exception e) {
+        //} catch (ApiException | ClientException e) {
+            throw new RuntimeException(e);
+        }
+        //throw new UnsupportedOperationException("Not supported yet");
     }
 
     private Conversation getDaiVinchikConversation() {
