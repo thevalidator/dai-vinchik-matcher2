@@ -48,6 +48,10 @@ public class CaseMatcherImpl implements CaseMatcher {
             type = CaseType.ADVICE;
         }
 
+        else if (isSleeping(message)) {
+            type = CaseType.SLEEPING;
+        }
+
         //somebody likes you
 
         //want to meet
@@ -133,16 +137,36 @@ public class CaseMatcherImpl implements CaseMatcher {
     }
 
     public boolean isAdvice(MessageAndKeyboard data) {
+        Message message = data.getMessage();
         Keyboard keyboard = data.getKeyboard();
         List<List<KeyboardButton>> buttonRows = keyboard.getButtons();
-        return buttonRows.size() == 1
+        return !message.getText().contains("Ты понравил")   //@TODO: improve text check conditions
+                && buttonRows.size() == 1
                 && buttonRows.get(0).size() == 2
                 && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
-                && buttonRows.get(0).get(0).getAction().getLabel().equals("Как это работает?")
+                //&& buttonRows.get(0).get(0).getAction().getLabel().equals("Как это работает?")
                 && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.POSITIVE.getValue())
                 && buttonRows.get(0).get(1).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
-                && buttonRows.get(0).get(1).getAction().getLabel().equals("Хороший совет")
+                //&& buttonRows.get(0).get(1).getAction().getLabel().equals("Хороший совет")
                 && buttonRows.get(0).get(1).getColor().equals(KeyboardButtonColor.DEFAULT.getValue());
+    }
+
+    public boolean isSleeping(MessageAndKeyboard data) {
+        Message message = data.getMessage();
+        Keyboard keyboard = data.getKeyboard();
+        List<List<KeyboardButton>> buttonRows = keyboard.getButtons();
+        return message.getText().startsWith("1. Смотреть анкеты.")
+                && message.getText().endsWith("Бот знакомств Дайвинчик в Telegram.")
+                && buttonRows.size() == 1
+                && buttonRows.get(0).size() == 4
+                && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.POSITIVE.getValue())
+                && buttonRows.get(0).get(1).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && buttonRows.get(0).get(1).getColor().equals(KeyboardButtonColor.DEFAULT.getValue())
+                && buttonRows.get(0).get(2).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && buttonRows.get(0).get(2).getColor().equals(KeyboardButtonColor.DEFAULT.getValue())
+                && buttonRows.get(0).get(3).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && buttonRows.get(0).get(3).getColor().equals(KeyboardButtonColor.DEFAULT.getValue());
     }
 
     public boolean notAvailableToContinue(MessageAndKeyboard message) {

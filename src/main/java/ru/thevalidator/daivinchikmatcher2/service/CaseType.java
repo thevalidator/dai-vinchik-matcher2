@@ -8,6 +8,7 @@ public enum CaseType {
     LOCATION,
     ADS_DV,
     ADVICE,
+    SLEEPING,
 
 
 
@@ -17,12 +18,15 @@ public enum CaseType {
 //    WANT_TO_MEET,
 //    MUTUAL_LIKE,
 //    LONG_TIME_AWAY,
-//    ADVERTISEMENT,
+//+++    ADVERTISEMENT,
 //    PROFILE_AFTER_WRONG_ANSWER,
 //    GOT_LIKES,
 //    SKIP_BUTTON,
 //    SKIP_TEXT,
 //    CAN_NOT_CONTINUE,
+
+
+
     CAPTCHA
 
 }

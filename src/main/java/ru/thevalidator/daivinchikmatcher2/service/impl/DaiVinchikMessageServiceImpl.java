@@ -6,6 +6,7 @@ import com.vk.api.sdk.client.actors.UserActor;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.objects.messages.Message;
+import com.vk.api.sdk.objects.messages.responses.GetByConversationMessageIdResponse;
 import com.vk.api.sdk.objects.messages.responses.GetByIdResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +17,12 @@ import ru.thevalidator.daivinchikmatcher2.vk.dto.DaiVinchikDialogAnswer;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.GetConversationsByIdResponse;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.Response;
+import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.SendMessageResultResponse;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.Conversation;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keyboard.Keyboard;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
 
@@ -31,7 +36,7 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
     }
 
     @Override
-    public MessageAndKeyboard getDaiVinchikLastMessage() {
+    public MessageAndKeyboard getDaiVinchikLastMessageAndKeyboard() {
         Conversation c = getDaiVinchikConversation();
         Keyboard keyboard = c.getCurrentKeyboard();
         Message message = getMessageById(c.getLastMessageId());
@@ -39,7 +44,31 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
     }
 
     @Override
-    public void sendMessage(DaiVinchikDialogAnswer answer) {
+    public MessageAndKeyboard getDaiVinchikMessageById(Integer id) {
+        Conversation c = getDaiVinchikConversation();
+        Keyboard keyboard = c.getCurrentKeyboard();
+        Message message = getMessageById(id);
+        return new MessageAndKeyboard(message, keyboard);
+    }
+
+    @Override
+    public Integer getDaiVinchikLastConversationMessageId() {
+        Conversation c = getDaiVinchikConversation();
+        return c.getLastConversationMessageId();
+    }
+
+    @Override
+    public List<Message> getDaiVinchikMessagesByConversationId(List<Integer> ids) {
+//        List<Message> messages = getMessageByConversationId(ids);
+//        List<MessageAndKeyboard> data = new ArrayList<>();
+//        for (Message message: messages) {
+//            data.add(new MessageAndKeyboard(message, null));
+//        }
+        return getMessageByConversationId(ids);
+    }
+
+    @Override
+    public SendMessageResultResponse sendMessage(DaiVinchikDialogAnswer answer) {
         try {
             var r = vk.messages().sendUserIds(actor)
                     .userId(Settings.INSTANCE.getDaiVinchickPeerId())
@@ -48,7 +77,12 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
                     .executeAsString();
                     //.execute();
             //LOG.debug(r.toString());
-            System.out.println(r);
+            SendMessageResultResponse rs = SerializerUtil.getMapper().readValue(r, SendMessageResultResponse.class);
+            //@TODO: handle errors
+            Message m = getMessageById(rs.getResponse());
+            rs.setConversationMessageId(m.getConversationMessageId());
+            System.out.println(rs);
+            return rs;
         } catch (Exception e) {
         //} catch (ApiException | ClientException e) {
             throw new RuntimeException(e);
@@ -76,11 +110,11 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
         //@TODO: handle all exceptions and errors: https://dev.vk.com/ru/method/messages.getConversationsById
     }
 
-    private Message getMessageById(Integer lastMessageId) {
+    private Message getMessageById(Integer messageId) {
         try {
             GetByIdResponse rs = vk.messages()
                     .getById(actor)
-                    .messageIds(lastMessageId)
+                    .messageIds(messageId)
                     .execute();
             LOG.debug("Receive messages by id response: {}", rs.toString());
             //@TODO: extract method for checking
@@ -92,6 +126,19 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
             throw new RuntimeException(e);
         }
         //@TODO: handle all exceptions and errors: https://dev.vk.com/ru/method/messages.getById
+    }
+
+    private List<Message> getMessageByConversationId(List<Integer> ids) {
+        try {
+            GetByConversationMessageIdResponse rs = vk.messages()
+                    .getByConversationMessageId(actor, Settings.INSTANCE.getDaiVinchickPeerId(), ids)
+                    .execute();
+            LOG.debug("Receive messages by conversation id response: {}", rs.toString());
+
+            return rs.getItems();
+        } catch (ApiException | ClientException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

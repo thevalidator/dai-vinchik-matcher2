@@ -14,8 +14,6 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
 
     private static final Logger LOG = LoggerFactory.getLogger(DaiVinchikDialogAnswerServiceImpl.class);
     private final CaseMatcher matcher;
-    private int counter = 0;
-    private int lastMessageId = 0;
 
     public DaiVinchikDialogAnswerServiceImpl() {
         matcher = new CaseMatcherImpl();
@@ -27,8 +25,6 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
 
     @Override
     public DaiVinchikDialogAnswer findAnswer(MessageAndKeyboard data) {
-        LOG.info("Iteration: {}, missed {}", ++counter, (data.getMessage().getConversationMessageId() - lastMessageId + 2)); //@TODO: transfer to main service class
-        lastMessageId = data.getMessage().getConversationMessageId();
         DaiVinchikDialogAnswer answer = new DaiVinchikDialogAnswer();
         CaseType type = matcher.detectCase(data);
         if (type.equals(CaseType.PROFILE)) {
@@ -51,9 +47,12 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
             LOG.debug("ADVICE: {}", data);
             String text = data.getKeyboard().getButtons().get(0).get(1).getAction().getPayload();
             answer.setText(text);
+        } else if (type.equals(CaseType.SLEEPING)) {
+            LOG.debug("SLEEPING: {}", data);
+            String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
+            answer.setText(text);
         } else {
             LOG.debug("UNKNOWN STATE: {}", data);
-            System.out.println("Кто-то хочет познакомиться");
             System.out.println("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" +
                     "\nMESSAGE: " + data.getMessage().getText());
             System.out.println("\nKEYBOARD: " + data.getKeyboard().getButtons());

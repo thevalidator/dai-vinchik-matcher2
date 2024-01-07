@@ -4,6 +4,7 @@ import com.vk.api.sdk.client.VkApiClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.thevalidator.daivinchikmatcher2.account.UserAccount;
+import ru.thevalidator.daivinchikmatcher2.config.settings.Settings;
 import ru.thevalidator.daivinchikmatcher2.service.CaseMatcher;
 import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikDialogAnswerService;
 import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMessageService;
@@ -14,7 +15,10 @@ import ru.thevalidator.daivinchikmatcher2.task.Task;
 import ru.thevalidator.daivinchikmatcher2.vk.custom.actor.CustomUserActor;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.DaiVinchikDialogAnswer;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
+import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.SendMessageResultResponse;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class DaiVinchikDialogHandler implements Task {
@@ -29,7 +33,7 @@ public class DaiVinchikDialogHandler implements Task {
     private final DaiVinchikDialogAnswerService answerService;
     private final Statistic stats;
     private boolean isActive;
-
+    private int counter = 0;
 
     public DaiVinchikDialogHandler(VkApiClient vk, UserAccount account) {
         this.vk = vk;
@@ -45,12 +49,24 @@ public class DaiVinchikDialogHandler implements Task {
     public void run() {
         isActive = true;
         LOG.debug("Start task");
+        MessageAndKeyboard data;
+        Integer lastConversationMessageId = messageService.getDaiVinchikLastConversationMessageId();
+        LOG.debug("Last conversation message id: {}", lastConversationMessageId);
+        int messageDelta;
         while (isActive) {
-            MessageAndKeyboard data = messageService.getDaiVinchikLastMessage();
+            data = messageService.getDaiVinchikLastMessageAndKeyboard();
+            messageDelta = data.getMessage().getConversationMessageId() - lastConversationMessageId;
+            LOG.info("Iteration: {}, delta {}", ++counter, messageDelta);
             LOG.debug("Message with keyboard: {}", data);
+            if (messageDelta > 1) {
+                handleMissedMessages(lastConversationMessageId + 1, data.getMessage().getConversationMessageId());
+            }
             DaiVinchikDialogAnswer answer = answerService.findAnswer(data);
             LOG.debug("Dialog answer found: {}", answer);
-            messageService.sendMessage(answer);
+            SendMessageResultResponse resultRs = messageService.sendMessage(answer);
+            LOG.debug("Send message result response: {}", resultRs);
+            //@TODO: check for response errors
+            lastConversationMessageId = resultRs.getConversationMessageId();
             try {
                 System.out.println("SLEEPING 12 SECONDS");
                 TimeUnit.SECONDS.sleep(12);
@@ -59,6 +75,20 @@ public class DaiVinchikDialogHandler implements Task {
             }
         }
         LOG.debug("Finish task");
+    }
+
+    private void handleMissedMessages(int from, int to) {
+        List<Integer> ids = new ArrayList<>();
+        for (int i = from; i <= to; i++) {
+            ids.add(i);
+        }
+        var rs = messageService.getDaiVinchikMessagesByConversationId(ids);
+        for (var m: rs) {
+            if (m.getFromId().equals(Settings.INSTANCE.getDaiVinchickPeerId())) {
+                LOG.info("MISSED: {}",m);
+                //@TODO: check for profile
+            }
+        }
     }
 
     @Override
