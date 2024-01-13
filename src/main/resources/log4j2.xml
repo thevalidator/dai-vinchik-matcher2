@@ -26,6 +26,9 @@
         <Logger name="ru.thevalidator.daivinchikmatcher2.task.request.DaiVinchikDialogHandler" level="debug" additivity="false">
             <AppenderRef ref="Task"/>
         </Logger>
+        <Logger name="ru.thevalidator.daivinchikmatcher2.service.impl.DaiVinchikMessageServiceImpl" level="debug" additivity="false">
+            <AppenderRef ref="Task"/>
+        </Logger>
 <!--        <Logger name="ru.thevalidator.daivinchikmatcher2.task.longpoll" level="debug"/>-->
 <!--        <Logger name="ru.thevalidator.daivinchikmatcher2.task.request" level="debug"/>-->
 <!--        <Logger name="ru.thevalidator.daivinchikmatcher2.vk.custom.transport" level="debug"/>-->
