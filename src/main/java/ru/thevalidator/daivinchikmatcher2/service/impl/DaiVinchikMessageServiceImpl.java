@@ -1,6 +1,5 @@
 package ru.thevalidator.daivinchikmatcher2.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.UserActor;
 import com.vk.api.sdk.exceptions.ApiException;
@@ -21,7 +20,6 @@ import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.SendMessageResultR
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.Conversation;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keyboard.Keyboard;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
@@ -77,7 +75,7 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
                     .executeAsString();
                     //.execute();
             //LOG.debug(r.toString());
-            SendMessageResultResponse rs = SerializerUtil.getMapper().readValue(r, SendMessageResultResponse.class);
+            SendMessageResultResponse rs = SerializerUtil.readJson(r, SendMessageResultResponse.class);
             //@TODO: handle errors
             Message m = getMessageById(rs.getResponse());
             rs.setConversationMessageId(m.getConversationMessageId());
@@ -98,13 +96,13 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
                     .getJson()
                     .getAsString();
             LOG.debug("Receive conversations by id response: {}", json);
-            GetConversationsByIdResponse rs = SerializerUtil.getMapper().readValue(json, Response.class).getResponse();
+            GetConversationsByIdResponse rs = SerializerUtil.readJson(json, Response.class).getResponse();
             //@TODO: extract method for checking
-            if (rs.getCount() > 1) {
+            if (rs.getCount() != 1) {
                 throw new IllegalArgumentException("Count=" + rs.getCount() + ", but should be 1");
             }
             return rs.getItems().get(0);
-        } catch (ClientException | JsonProcessingException e) {
+        } catch (ClientException e) {
             throw new RuntimeException(e);
         }
         //@TODO: handle all exceptions and errors: https://dev.vk.com/ru/method/messages.getConversationsById

@@ -1,13 +1,15 @@
 package ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.google.gson.annotations.SerializedName;
+import com.vk.api.sdk.objects.annotations.Required;
 
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class ConversationSortId {
+
+    @SerializedName("major_id")
+    @Required
     private Integer majorId;
+    @SerializedName("minor_id")
+    @Required
     private Integer minorId;
 
     public Integer getMajorId() {
@@ -33,4 +35,5 @@ public class ConversationSortId {
                 ", minorId=" + minorId +
                 '}';
     }
+
 }

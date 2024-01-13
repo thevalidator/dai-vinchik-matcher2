@@ -1,8 +1,5 @@
 package ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class SendMessageResultResponse {
 
     private Integer response;

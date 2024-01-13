@@ -1,13 +1,11 @@
 package ru.thevalidator.daivinchikmatcher2.vk.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vk.api.sdk.objects.messages.Message;
 import ru.thevalidator.daivinchikmatcher2.util.data.SerializerUtil;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keyboard.Keyboard;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageAndKeyboard {
+
     private Message message;
     private Keyboard keyboard;
 
@@ -38,9 +36,10 @@ public class MessageAndKeyboard {
     @Override
     public String toString() {
         try {
-            return SerializerUtil.getMapper().writeValueAsString(this);
-        } catch (JsonProcessingException e) {
+            return SerializerUtil.writeJson(this);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
 }

@@ -1,35 +1,65 @@
 package ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.google.gson.annotations.SerializedName;
+import com.vk.api.sdk.objects.annotations.Required;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keyboard.Keyboard;
 
 import java.util.List;
 
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Conversation {
+
+    @SerializedName("can_write")
     private ConversationCanWrite canWrite;
 
+    @SerializedName("current_keyboard")
     private Keyboard currentKeyboard;
 
+    @SerializedName("important")
     private Boolean important;
 
+    /**
+     * Last message user have read
+     */
+    @SerializedName("in_read")
+    @Required
     private Integer inRead;
 
+    /**
+     * Is this conversation uread
+     */
+    @SerializedName("is_marked_unread")
     private Boolean isMarkedUnread;
 
+    /**
+     * Conversation message ID of the last message in conversation
+     */
+    @SerializedName("last_conversation_message_id")
     private Integer lastConversationMessageId;
 
+    /**
+     * ID of the last message in conversation
+     */
+    @SerializedName("last_message_id")
+    @Required
     private Integer lastMessageId;
 
+    /**
+     * Ids of messages with mentions
+     */
+    @SerializedName("mentions")
     private List<Integer> mentions;
 
+    /**
+     * Last outcoming message have been read by the opponent
+     */
+    @SerializedName("out_read")
+    @Required
     private Integer outRead;
 
+    @SerializedName("sort_id")
     private ConversationSortId sortId;
 
+    //@SerializedName("chat_settings")
     //private ChatSettings chatSettings;
 
     //private MessageRequestData messageRequestData;
@@ -44,6 +74,7 @@ public class Conversation {
 
     private Boolean unanswered;
 
+    @SerializedName("unread_count")
     private Integer unreadCount;
 
     public ConversationCanWrite getCanWrite() {
@@ -159,4 +190,5 @@ public class Conversation {
                 ", unreadCount=" + unreadCount +
                 '}';
     }
+
 }

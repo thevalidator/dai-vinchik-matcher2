@@ -1,25 +1,29 @@
 package ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keyboard;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.google.gson.annotations.SerializedName;
+import com.vk.api.sdk.objects.annotations.Required;
 
 import java.util.List;
 
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Keyboard {
+
+    /**
+     * Community or bot, which set this keyboard
+     * Entity: owner
+     */
+    @SerializedName("author_id")
     private Long authorId;
 
+    @Required
     private List<List<KeyboardButton>> buttons;
 
-    @JsonProperty("inline")
     private Boolean inline;
 
     /**
      * Should this keyboard disappear on first use
      */
+    @SerializedName("one_time")
+    @Required
     private Boolean oneTime;
 
     public Long getAuthorId() {

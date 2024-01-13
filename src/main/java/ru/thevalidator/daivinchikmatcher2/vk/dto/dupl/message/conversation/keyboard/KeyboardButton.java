@@ -1,8 +1,5 @@
 package ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keyboard;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class KeyboardButton {
 
     private KeyboardButtonAction action;
@@ -32,4 +29,5 @@ public class KeyboardButton {
                 ", color=" + color +
                 '}';
     }
+
 }
