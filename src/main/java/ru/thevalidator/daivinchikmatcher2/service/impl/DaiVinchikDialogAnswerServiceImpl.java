@@ -51,6 +51,14 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
             LOG.debug("SLEEPING: {}", data);
             String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
             answer.setText(text);
+        } else if (type.equals(CaseType.PROFILE_LIKED_ME)) {
+            LOG.debug("PROFILE LIKED ME: {}", data);
+            String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
+            answer.setText(text);
+        } else if (type.equals(CaseType.CAN_NOT_CONTINUE)) {
+            LOG.debug("CAN NOT CONTINUE: {}", data);
+            answer = null;
+            //@TODO: throw exception ???
         } else {
             LOG.debug("UNKNOWN STATE: {}", data);
             System.out.println("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" +
@@ -60,8 +68,11 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
             System.out.print("\n>>>>\tENTER CORRECT ANSWER:");
             String input = sc.nextLine();
             System.out.println();
-            LOG.debug("STATE ANSWER: {}", input);
             answer.setText(input);
+        }
+
+        if (answer != null) {
+            LOG.debug("{} STATE ANSWER: {}",type, answer.getText());
         }
 
         return answer;

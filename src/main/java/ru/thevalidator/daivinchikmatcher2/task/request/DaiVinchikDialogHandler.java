@@ -63,6 +63,10 @@ public class DaiVinchikDialogHandler implements Task {
             }
             DaiVinchikDialogAnswer answer = answerService.findAnswer(data);
             LOG.debug("Dialog answer found: {}", answer);
+            if (answer == null) {
+                isActive = false;
+                break;
+            }
             SendMessageResultResponse resultRs = messageService.sendMessage(answer);
             LOG.debug("Send message result response: {}", resultRs);
             //@TODO: check for response errors
