@@ -11,6 +11,7 @@ public enum CaseType {
     ADS_DV,
     ADVICE,
     SLEEPING,
+    TOO_MANY_LIKES,
     CAN_NOT_CONTINUE,
     LONG_TIME_AWAY,
     WANT_TO_MEET,

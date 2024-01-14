@@ -2,6 +2,8 @@ package ru.thevalidator.daivinchikmatcher2.service.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.thevalidator.daivinchikmatcher2.exception.CanNotContinueException;
+import ru.thevalidator.daivinchikmatcher2.exception.TooManyLikesForToday;
 import ru.thevalidator.daivinchikmatcher2.service.CaseMatcher;
 import ru.thevalidator.daivinchikmatcher2.service.CaseType;
 import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikDialogAnswerService;
@@ -55,10 +57,12 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
             LOG.debug("PROFILE LIKED ME: {}", data);
             String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
             answer.setText(text);
+        } else if (type.equals(CaseType.TOO_MANY_LIKES)) {
+            LOG.debug("TOO MANY LIKES: {}", data);
+            throw new TooManyLikesForToday();
         } else if (type.equals(CaseType.CAN_NOT_CONTINUE)) {
             LOG.debug("CAN NOT CONTINUE: {}", data);
-            answer = null;
-            //@TODO: throw exception ???
+            throw new CanNotContinueException(data);
         } else {
             LOG.debug("UNKNOWN STATE: {}", data);
             System.out.println("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" +
@@ -70,10 +74,7 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
             System.out.println();
             answer.setText(input);
         }
-
-        if (answer != null) {
-            LOG.debug("{} STATE ANSWER: {}",type, answer.getText());
-        }
+        LOG.debug("{} STATE ANSWER: {}", type, answer.getText());
 
         return answer;
     }

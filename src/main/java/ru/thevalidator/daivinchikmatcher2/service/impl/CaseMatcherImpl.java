@@ -39,7 +39,7 @@ public class CaseMatcherImpl implements CaseMatcher {
         } else if (isAdvice(message)) {
             type = CaseType.ADVICE;
         } else if (isTooMuchForToday(message)) {
-            type = CaseType.CAN_NOT_CONTINUE;
+            type = CaseType.TOO_MANY_LIKES;
         } else if (isWantToMeet(message)) {
             type = CaseType.WANT_TO_MEET;
         } else if (hasLikeFromSomeone(message)) {

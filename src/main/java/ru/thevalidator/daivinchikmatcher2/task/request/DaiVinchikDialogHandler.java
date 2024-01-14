@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.thevalidator.daivinchikmatcher2.account.UserAccount;
 import ru.thevalidator.daivinchikmatcher2.config.settings.Settings;
+import ru.thevalidator.daivinchikmatcher2.exception.CanNotContinueException;
+import ru.thevalidator.daivinchikmatcher2.exception.TooManyLikesForToday;
 import ru.thevalidator.daivinchikmatcher2.service.CaseMatcher;
 import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikDialogAnswerService;
 import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMessageService;
@@ -32,7 +34,7 @@ public class DaiVinchikDialogHandler implements Task {
     private final CaseMatcher matcher;
     private final DaiVinchikDialogAnswerService answerService;
     private final Statistic stats;
-    private boolean isActive;
+    private volatile boolean isActive;
     private int counter = 0;
 
     public DaiVinchikDialogHandler(VkApiClient vk, UserAccount account) {
@@ -54,27 +56,35 @@ public class DaiVinchikDialogHandler implements Task {
         LOG.debug("Last conversation message id: {}", lastConversationMessageId);
         int messageDelta;
         while (isActive) {
-            data = messageService.getDaiVinchikLastMessageAndKeyboard();
-            messageDelta = data.getMessage().getConversationMessageId() - lastConversationMessageId;
-            LOG.info("Iteration: {}, delta {}", ++counter, messageDelta);
-            LOG.debug("Message with keyboard: {}", data);
-            if (messageDelta > 1) {
-                handleMissedMessages(lastConversationMessageId + 1, data.getMessage().getConversationMessageId());
-            }
-            DaiVinchikDialogAnswer answer = answerService.findAnswer(data);
-            LOG.debug("Dialog answer found: {}", answer);
-            if (answer == null) {
-                isActive = false;
-                break;
-            }
-            SendMessageResultResponse resultRs = messageService.sendMessage(answer);
-            LOG.debug("Send message result response: {}", resultRs);
-            //@TODO: check for response errors
-            lastConversationMessageId = resultRs.getConversationMessageId();
             try {
+                data = messageService.getDaiVinchikLastMessageAndKeyboard();
+                messageDelta = data.getMessage().getConversationMessageId() - lastConversationMessageId;
+                LOG.info("Iteration: {}, delta {}", ++counter, messageDelta);
+                LOG.debug("Message with keyboard: {}", data);
+                if (messageDelta > 1) {
+                    handleMissedMessages(lastConversationMessageId + 1, data.getMessage().getConversationMessageId());
+                }
+                DaiVinchikDialogAnswer answer = answerService.findAnswer(data);
+                LOG.debug("Dialog answer found: {}", answer);
+                if (answer == null) {
+                    isActive = false;
+                    break;
+                }
+                SendMessageResultResponse resultRs = messageService.sendMessage(answer);
+                LOG.debug("Send message result response: {}", resultRs);
+                //@TODO: check for response errors
+                lastConversationMessageId = resultRs.getConversationMessageId();
+
                 System.out.println("SLEEPING 12 SECONDS");
                 TimeUnit.SECONDS.sleep(12);
-            } catch (InterruptedException e) {
+            } catch (TooManyLikesForToday e) {
+                isActive = false;
+            } catch (CanNotContinueException e) {
+                LOG.error("Error on message data: {}", e.getData());
+                isActive = false;
+                throw e;
+            } catch (Exception e) {
+                isActive = false;
                 throw new RuntimeException(e);
             }
         }
@@ -89,7 +99,7 @@ public class DaiVinchikDialogHandler implements Task {
         var rs = messageService.getDaiVinchikMessagesByConversationId(ids);
         for (var m: rs) {
             if (m.getFromId().equals(Settings.INSTANCE.getDaiVinchickPeerId())) {
-                LOG.info("MISSED: {}",m);
+                LOG.info("MISSED: {}", m);
                 //@TODO: check for profile
             }
         }
