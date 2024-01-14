@@ -4,7 +4,11 @@ import com.vk.api.sdk.client.TransportClient;
 import com.vk.api.sdk.client.VkApiClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import ru.thevalidator.daivinchikmatcher2.account.UserAccount;
+import ru.thevalidator.daivinchikmatcher2.config.SpringJavaConfig;
+import ru.thevalidator.daivinchikmatcher2.service.CaseMatcher;
+import ru.thevalidator.daivinchikmatcher2.service.impl.CaseMatcherImpl;
 import ru.thevalidator.daivinchikmatcher2.task.request.DaiVinchikDialogHandler;
 import ru.thevalidator.daivinchikmatcher2.vk.custom.transport.HttpTransportClientWithCustomUserAgent;
 
@@ -20,22 +24,28 @@ public class Main {
     public static void main(String[] args) throws InterruptedException, IOException {
         LOG.info("DAI-VINCHIK-MATCHER 2 -> START");
 
-        TransportClient transportClient = new HttpTransportClientWithCustomUserAgent("Java VK SDK/1.0");
-        VkApiClient vk = new VkApiClient(transportClient);
+        var context = new AnnotationConfigApplicationContext(SpringJavaConfig.class);
+        //CaseMatcher b = context.getBean(CaseMatcherImpl.class);
+        //b.detectCase()
+        System.out.println();
 
-        Path path = Paths.get("data/config/token");
-        String token = Files.readString(path);
-        LOG.debug("Token found: {}", token);
-        UserAccount account = new UserAccount("user", token);
+//        TransportClient transportClient = new HttpTransportClientWithCustomUserAgent("Java VK SDK/1.0");
+//        VkApiClient vk = new VkApiClient(transportClient);
+//
+//        Path path = Paths.get("data/config/token");
+//        String token = Files.readString(path);
+//        LOG.debug("Token found: {}", token);
+//        UserAccount account = new UserAccount("user", token);
+//
+//
+//        //UserLongPollSpectatorService service = new UserLongPollSpectatorService(vk, account);
+//        DaiVinchikDialogHandler service = new DaiVinchikDialogHandler(vk, account);
+//
+//        //new thread
+//        Thread thread = new Thread(service);
+//        thread.start();
+//        thread.join();
 
-
-        //UserLongPollSpectatorService service = new UserLongPollSpectatorService(vk, account);
-        DaiVinchikDialogHandler service = new DaiVinchikDialogHandler(vk, account);
-
-        //new thread
-        Thread thread = new Thread(service);
-        thread.start();
-        thread.join();
         LOG.info("DAI-VINCHIK-MATCHER 2 -> END");
 
 

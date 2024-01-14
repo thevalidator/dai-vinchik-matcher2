@@ -9,6 +9,10 @@ import com.vk.api.sdk.objects.messages.responses.GetByConversationMessageIdRespo
 import com.vk.api.sdk.objects.messages.responses.GetByIdResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import ru.thevalidator.daivinchikmatcher2.config.settings.Settings;
 import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMessageService;
 import ru.thevalidator.daivinchikmatcher2.util.data.SerializerUtil;
@@ -22,12 +26,15 @@ import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keybo
 
 import java.util.List;
 
+@Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DaiVinchikMessageServiceImpl.class);
     private final VkApiClient vk;
     private final UserActor actor;
 
+    @Autowired
     public DaiVinchikMessageServiceImpl(VkApiClient vk, UserActor actor) {
         this.vk = vk;
         this.actor = actor;
@@ -57,11 +64,6 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
 
     @Override
     public List<Message> getDaiVinchikMessagesByConversationId(List<Integer> ids) {
-//        List<Message> messages = getMessageByConversationId(ids);
-//        List<MessageAndKeyboard> data = new ArrayList<>();
-//        for (Message message: messages) {
-//            data.add(new MessageAndKeyboard(message, null));
-//        }
         return getMessageByConversationId(ids);
     }
 
@@ -73,7 +75,6 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
                     .randomId(0)
                     .message(answer.getText())
                     .executeAsString();
-                    //.execute();
             //LOG.debug(r.toString());
             SendMessageResultResponse rs = SerializerUtil.readJson(r, SendMessageResultResponse.class);
             //@TODO: handle errors

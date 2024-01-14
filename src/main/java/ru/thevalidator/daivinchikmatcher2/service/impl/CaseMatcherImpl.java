@@ -6,6 +6,7 @@ import com.vk.api.sdk.objects.messages.KeyboardButtonColor;
 import com.vk.api.sdk.objects.messages.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import ru.thevalidator.daivinchikmatcher2.service.CaseMatcher;
 import ru.thevalidator.daivinchikmatcher2.service.CaseType;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
@@ -14,6 +15,7 @@ import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keybo
 
 import java.util.List;
 
+@Component
 public class CaseMatcherImpl implements CaseMatcher {
 
     private static final Logger LOG = LoggerFactory.getLogger(CaseMatcherImpl.class);

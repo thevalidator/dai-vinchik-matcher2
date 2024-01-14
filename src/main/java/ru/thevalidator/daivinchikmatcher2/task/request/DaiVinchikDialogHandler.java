@@ -1,23 +1,20 @@
 package ru.thevalidator.daivinchikmatcher2.task.request;
 
-import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.objects.messages.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.thevalidator.daivinchikmatcher2.account.UserAccount;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import ru.thevalidator.daivinchikmatcher2.config.settings.Settings;
 import ru.thevalidator.daivinchikmatcher2.exception.CanNotContinueException;
 import ru.thevalidator.daivinchikmatcher2.exception.TooManyLikesForToday;
-import ru.thevalidator.daivinchikmatcher2.service.CaseMatcher;
 import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikDialogAnswerService;
 import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMessageService;
 import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMissedMessageService;
-import ru.thevalidator.daivinchikmatcher2.service.impl.CaseMatcherImpl;
-import ru.thevalidator.daivinchikmatcher2.service.impl.DaiVinchikDialogAnswerServiceImpl;
-import ru.thevalidator.daivinchikmatcher2.service.impl.DaiVinchikMessageServiceImpl;
 import ru.thevalidator.daivinchikmatcher2.service.impl.DaiVinchikMissedMessageServiceImpl;
 import ru.thevalidator.daivinchikmatcher2.task.Task;
-import ru.thevalidator.daivinchikmatcher2.vk.custom.actor.CustomUserActor;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.DaiVinchikDialogAnswer;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.SendMessageResultResponse;
@@ -26,29 +23,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+@Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DaiVinchikDialogHandler implements Task {
 
     private static final Logger LOG = LoggerFactory.getLogger(DaiVinchikDialogHandler.class);
-    private final CustomUserActor actor;
     private final DaiVinchikMessageService messageService;
     private static final Integer LAST_MESSAGES_COUNT = 5;
-    private final VkApiClient vk;
-    private final UserAccount account;
-    private final CaseMatcher matcher;
     private final DaiVinchikDialogAnswerService answerService;
     private final DaiVinchikMissedMessageService missedMessageService;
     private final Statistic stats;
     private volatile boolean isActive;
     private int counter = 0;
 
-    public DaiVinchikDialogHandler(VkApiClient vk, UserAccount account) {
-        this.vk = vk;
-        this.account = account;
-        this.actor = new CustomUserActor(account.getToken());
-        messageService = new DaiVinchikMessageServiceImpl(vk, actor);
-        answerService = new DaiVinchikDialogAnswerServiceImpl();
+    @Autowired
+    public DaiVinchikDialogHandler(DaiVinchikMessageService messageService, DaiVinchikDialogAnswerService answerService) {
+        this.messageService = messageService;
+        this.answerService = answerService;
         missedMessageService = new DaiVinchikMissedMessageServiceImpl();
-        matcher = new CaseMatcherImpl();
         stats = new Statistic();
     }
 
@@ -106,13 +98,13 @@ public class DaiVinchikDialogHandler implements Task {
             if (m.getFromId().equals(Settings.INSTANCE.getDaiVinchickPeerId())) {
                 LOG.info("MISSED: {}", m);
                 missedMessageService.handleMessage(m);
-                //@TODO: check for profile
             }
         }
     }
 
     @Override
     public void stop() {
+        //@TODO: implement
         throw new UnsupportedOperationException("Not supported yet");
     }
 

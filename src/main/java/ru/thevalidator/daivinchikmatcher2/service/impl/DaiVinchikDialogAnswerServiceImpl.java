@@ -2,6 +2,8 @@ package ru.thevalidator.daivinchikmatcher2.service.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import ru.thevalidator.daivinchikmatcher2.exception.CanNotContinueException;
 import ru.thevalidator.daivinchikmatcher2.exception.TooManyLikesForToday;
 import ru.thevalidator.daivinchikmatcher2.service.CaseMatcher;
@@ -12,15 +14,13 @@ import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
 
 import java.util.Scanner;
 
+@Component
 public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswerService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DaiVinchikDialogAnswerServiceImpl.class);
     private final CaseMatcher matcher;
 
-    public DaiVinchikDialogAnswerServiceImpl() {
-        matcher = new CaseMatcherImpl();
-    }
-
+    @Autowired
     public DaiVinchikDialogAnswerServiceImpl(CaseMatcher matcher) {
         this.matcher = matcher;
     }
@@ -55,6 +55,12 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
             answer.setText(text);
         } else if (type.equals(CaseType.PROFILE_LIKED_ME)) {
             LOG.debug("PROFILE LIKED ME: {}", data);
+            //@TODO: check if the answer is correct
+            String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
+            answer.setText(text);
+        } else if (type.equals(CaseType.SOMEBODY_LIKES_YOU)) {
+            LOG.debug("SOMEBODY LIKED ME: {}", data);
+            //@TODO: check if the answer is correct
             String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
             answer.setText(text);
         } else if (type.equals(CaseType.TOO_MANY_LIKES)) {

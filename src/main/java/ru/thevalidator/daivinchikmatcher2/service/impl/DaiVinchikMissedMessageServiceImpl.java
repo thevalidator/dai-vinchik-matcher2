@@ -7,7 +7,8 @@ public class DaiVinchikMissedMessageServiceImpl implements DaiVinchikMissedMessa
 
     @Override
     public void handleMessage(Message message) {
-        throw new UnsupportedOperationException("Not supported yet");
+        //@TODO: check for profile
+        // throw new UnsupportedOperationException("Not supported yet");
     }
 
 }
