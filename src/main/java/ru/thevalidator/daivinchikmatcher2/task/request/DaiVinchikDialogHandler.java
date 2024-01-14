@@ -1,6 +1,7 @@
 package ru.thevalidator.daivinchikmatcher2.task.request;
 
 import com.vk.api.sdk.client.VkApiClient;
+import com.vk.api.sdk.objects.messages.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.thevalidator.daivinchikmatcher2.account.UserAccount;
@@ -10,9 +11,11 @@ import ru.thevalidator.daivinchikmatcher2.exception.TooManyLikesForToday;
 import ru.thevalidator.daivinchikmatcher2.service.CaseMatcher;
 import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikDialogAnswerService;
 import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMessageService;
+import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMissedMessageService;
 import ru.thevalidator.daivinchikmatcher2.service.impl.CaseMatcherImpl;
 import ru.thevalidator.daivinchikmatcher2.service.impl.DaiVinchikDialogAnswerServiceImpl;
 import ru.thevalidator.daivinchikmatcher2.service.impl.DaiVinchikMessageServiceImpl;
+import ru.thevalidator.daivinchikmatcher2.service.impl.DaiVinchikMissedMessageServiceImpl;
 import ru.thevalidator.daivinchikmatcher2.task.Task;
 import ru.thevalidator.daivinchikmatcher2.vk.custom.actor.CustomUserActor;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.DaiVinchikDialogAnswer;
@@ -33,6 +36,7 @@ public class DaiVinchikDialogHandler implements Task {
     private final UserAccount account;
     private final CaseMatcher matcher;
     private final DaiVinchikDialogAnswerService answerService;
+    private final DaiVinchikMissedMessageService missedMessageService;
     private final Statistic stats;
     private volatile boolean isActive;
     private int counter = 0;
@@ -43,6 +47,7 @@ public class DaiVinchikDialogHandler implements Task {
         this.actor = new CustomUserActor(account.getToken());
         messageService = new DaiVinchikMessageServiceImpl(vk, actor);
         answerService = new DaiVinchikDialogAnswerServiceImpl();
+        missedMessageService = new DaiVinchikMissedMessageServiceImpl();
         matcher = new CaseMatcherImpl();
         stats = new Statistic();
     }
@@ -97,9 +102,10 @@ public class DaiVinchikDialogHandler implements Task {
             ids.add(i);
         }
         var rs = messageService.getDaiVinchikMessagesByConversationId(ids);
-        for (var m: rs) {
+        for (Message m: rs) {
             if (m.getFromId().equals(Settings.INSTANCE.getDaiVinchickPeerId())) {
                 LOG.info("MISSED: {}", m);
+                missedMessageService.handleMessage(m);
                 //@TODO: check for profile
             }
         }
