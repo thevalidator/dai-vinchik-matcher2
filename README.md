@@ -7,9 +7,9 @@
 - [x] ~~add logging~~
 - [x] ~~add long poll spectator~~
 - [ ] set userID in custom actor after connect
-- [ ] feature 3
-- [ ] feature 3
-- [ ] feature 3
+- [ ] check if DV not answered
+- [ ] get missed messages
+- [ ] collect profile links
 - [ ] feature 3
 - [ ] feature 1
 - [ ] feature 1
