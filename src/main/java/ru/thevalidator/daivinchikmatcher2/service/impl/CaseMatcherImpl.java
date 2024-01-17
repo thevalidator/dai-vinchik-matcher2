@@ -48,6 +48,8 @@ public class CaseMatcherImpl implements CaseMatcher {
             type = CaseType.PROFILE;
         } else if (isWarning(data)) {
             type = CaseType.WARNING;
+        } else if (isQuestion(data)) {
+            type = CaseType.ONE_BUTTON_ANSWER;
         } else if (isLocation(data)) {
             type = CaseType.LOCATION;
         } else if (isAdsDV(data)) {
@@ -132,6 +134,17 @@ public class CaseMatcherImpl implements CaseMatcher {
                 && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
                 && buttonRows.get(0).get(0).getAction().getLabel().equals("Продолжить просмотр анкет")
                 && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.DEFAULT.getValue());
+    }
+
+    public boolean isQuestion(MessageAndKeyboard data) {
+        Keyboard keyboard = data.getKeyboard();
+        List<List<KeyboardButton>> buttonRows = keyboard.getButtons();
+        return !keyboard.getOneTime()
+                && buttonRows.size() == 1
+                && buttonRows.get(0).size() == 1
+                && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                //&& buttonRows.get(0).get(0).getAction().getLabel().equals("Продолжить просмотр анкет")
+                && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.POSITIVE.getValue());
     }
 
     public boolean isLocation(MessageAndKeyboard data) {

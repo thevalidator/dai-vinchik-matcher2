@@ -33,7 +33,7 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
             String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
             //String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getLabel();
             answer.setText(text);
-        } else if (type.equals(CaseType.WARNING)) {
+        } else if (type.equals(CaseType.WARNING) || type.equals(CaseType.ONE_BUTTON_ANSWER)) {
             String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
             answer.setText(text);
         } else if (type.equals(CaseType.LOCATION)) {
