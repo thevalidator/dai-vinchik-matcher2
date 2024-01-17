@@ -30,47 +30,41 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
         DaiVinchikDialogAnswer answer = new DaiVinchikDialogAnswer();
         CaseType type = matcher.detectCase(data);
         if (type.equals(CaseType.PROFILE)) {
-            LOG.debug("PROFILE: {}", data);
             String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
+            //String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getLabel();
             answer.setText(text);
         } else if (type.equals(CaseType.WARNING)) {
-            LOG.debug("WARNING: {}", data);
             String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
             answer.setText(text);
         } else if (type.equals(CaseType.LOCATION)) {
-            LOG.debug("LOCATION: {}", data);
             String text = data.getKeyboard().getButtons().get(1).get(0).getAction().getPayload();
             answer.setText(text);
         } else if (type.equals(CaseType.ADS_DV)) {
-            LOG.debug("ADS_DV: {}", data);
             String text = data.getKeyboard().getButtons().get(0).get(1).getAction().getPayload();
             answer.setText(text);
         } else if (type.equals(CaseType.ADVICE)) {
-            LOG.debug("ADVICE: {}", data);
             String text = data.getKeyboard().getButtons().get(0).get(1).getAction().getPayload();
             answer.setText(text);
         } else if (type.equals(CaseType.SLEEPING)) {
-            LOG.debug("SLEEPING: {}", data);
             String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
             answer.setText(text);
         } else if (type.equals(CaseType.PROFILE_LIKED_ME)) {
-            LOG.debug("PROFILE LIKED ME: {}", data);
             //@TODO: check if the answer is correct
             String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
             answer.setText(text);
         } else if (type.equals(CaseType.SOMEBODY_LIKES_YOU)) {
-            LOG.debug("SOMEBODY LIKED ME: {}", data);
             //@TODO: check if the answer is correct
             String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
             answer.setText(text);
         } else if (type.equals(CaseType.TOO_MANY_LIKES)) {
+            //@TODO: check record in logs without this log
             LOG.debug("TOO MANY LIKES: {}", data);
             throw new TooManyLikesForToday();
         } else if (type.equals(CaseType.CAN_NOT_CONTINUE)) {
+            //@TODO: check record in logs without this log
             LOG.debug("CAN NOT CONTINUE: {}", data);
             throw new CanNotContinueException(data);
         } else {
-            LOG.debug("UNKNOWN STATE: {}", data);
             System.out.println("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" +
                     "\nMESSAGE: " + data.getMessage().getText());
             System.out.println("\nKEYBOARD: " + data.getKeyboard().getButtons());
@@ -80,7 +74,6 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
             System.out.println();
             answer.setText(input);
         }
-        LOG.debug("{} STATE ANSWER: {}", type, answer.getText());
 
         return answer;
     }

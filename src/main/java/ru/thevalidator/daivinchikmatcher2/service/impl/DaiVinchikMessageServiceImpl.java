@@ -75,12 +75,13 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
                     .randomId(0)
                     .message(answer.getText())
                     .executeAsString();
-            //LOG.debug(r.toString());
+            LOG.trace("Receive raw response{}", r);
             SendMessageResultResponse rs = SerializerUtil.readJson(r, SendMessageResultResponse.class);
+            LOG.trace("Send message result response after serialization: {}", rs);
             //@TODO: handle errors
             Message m = getMessageById(rs.getResponse());
             rs.setConversationMessageId(m.getConversationMessageId());
-            System.out.println(rs);
+            LOG.debug("Send message result response: {}", rs);
             return rs;
         } catch (Exception e) {
         //} catch (ApiException | ClientException e) {

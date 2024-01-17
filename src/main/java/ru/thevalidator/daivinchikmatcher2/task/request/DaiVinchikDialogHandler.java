@@ -13,7 +13,6 @@ import ru.thevalidator.daivinchikmatcher2.exception.TooManyLikesForToday;
 import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikDialogAnswerService;
 import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMessageService;
 import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMissedMessageService;
-import ru.thevalidator.daivinchikmatcher2.service.impl.DaiVinchikMissedMessageServiceImpl;
 import ru.thevalidator.daivinchikmatcher2.task.Task;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.DaiVinchikDialogAnswer;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
@@ -37,10 +36,12 @@ public class DaiVinchikDialogHandler implements Task {
     private int counter = 0;
 
     @Autowired
-    public DaiVinchikDialogHandler(DaiVinchikMessageService messageService, DaiVinchikDialogAnswerService answerService) {
+    public DaiVinchikDialogHandler(DaiVinchikMessageService messageService,
+                                   DaiVinchikDialogAnswerService answerService,
+                                   DaiVinchikMissedMessageService missedMessageService) {
         this.messageService = messageService;
         this.answerService = answerService;
-        missedMessageService = new DaiVinchikMissedMessageServiceImpl();
+        this.missedMessageService = missedMessageService;
         stats = new Statistic();
     }
 
@@ -50,7 +51,7 @@ public class DaiVinchikDialogHandler implements Task {
         LOG.debug("Start task");
         MessageAndKeyboard data;
         Integer lastConversationMessageId = messageService.getDaiVinchikLastConversationMessageId();
-        LOG.debug("Last conversation message id: {}", lastConversationMessageId);
+        LOG.debug("Conversation last message id: {}", lastConversationMessageId);
         int messageDelta;
         while (isActive) {
             try {
@@ -59,7 +60,9 @@ public class DaiVinchikDialogHandler implements Task {
                 LOG.info("Iteration: {}, delta {}", ++counter, messageDelta);
                 LOG.debug("Message with keyboard: {}", data);
                 if (messageDelta > 1) {
-                    handleMissedMessages(lastConversationMessageId + 1, data.getMessage().getConversationMessageId());
+                    int from = lastConversationMessageId + 1;
+                    int to = data.getMessage().getConversationMessageId();
+                    handleMissedMessages(from, to);
                 }
                 DaiVinchikDialogAnswer answer = answerService.findAnswer(data);
                 LOG.debug("Dialog answer found: {}", answer);
@@ -68,11 +71,10 @@ public class DaiVinchikDialogHandler implements Task {
                     break;
                 }
                 SendMessageResultResponse resultRs = messageService.sendMessage(answer);
-                LOG.debug("Send message result response: {}", resultRs);
                 //@TODO: check for response errors
                 lastConversationMessageId = resultRs.getConversationMessageId();
 
-                System.out.println("SLEEPING 12 SECONDS");
+                System.out.println("[" + counter + "] SLEEPING 12 SECONDS");
                 TimeUnit.SECONDS.sleep(12);
             } catch (TooManyLikesForToday e) {
                 isActive = false;
@@ -90,14 +92,14 @@ public class DaiVinchikDialogHandler implements Task {
 
     private void handleMissedMessages(int from, int to) {
         List<Integer> ids = new ArrayList<>();
-        for (int i = from; i <= to; i++) {
+        for (int i = from; i < to; i++) { //@TODO: check if the last one not repeats
             ids.add(i);
         }
         var rs = messageService.getDaiVinchikMessagesByConversationId(ids);
         for (Message m: rs) {
             if (m.getFromId().equals(Settings.INSTANCE.getDaiVinchickPeerId())) {
                 LOG.info("MISSED: {}", m);
-                missedMessageService.handleMessage(m);
+                missedMessageService.findSympathy(m);
             }
         }
     }

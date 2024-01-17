@@ -17,6 +17,7 @@ public enum CaseType {
     WANT_TO_MEET,
     SOMEBODY_LIKES_YOU,
     SHOW_QUESTION,
+    NO_SUCH_ANSWER,
 
 
 
