@@ -12,17 +12,41 @@ import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikDialogAnswerService;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.DaiVinchikDialogAnswer;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 
 @Component
 public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswerService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DaiVinchikDialogAnswerServiceImpl.class);
     private final CaseMatcher matcher;
+    private Set<String> words;
 
     @Autowired
     public DaiVinchikDialogAnswerServiceImpl(CaseMatcher matcher) {
         this.matcher = matcher;
+        initWords();
+    }
+
+    private void initWords() {
+        words = new HashSet<>();
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(new FileInputStream("data/words.txt"),
+                        StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                words.add(line.trim().toLowerCase());
+            }
+        } catch (IOException ex) {
+            LOG.error(ex.getMessage());
+        }
+        LOG.info("Loaded {} words for matching", words.size());
     }
 
     @Override
@@ -30,29 +54,53 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
         DaiVinchikDialogAnswer answer = new DaiVinchikDialogAnswer();
         CaseType type = matcher.detectCase(data);
         if (type.equals(CaseType.PROFILE)) {
-            String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
+            LOG.debug("{}", CaseType.PROFILE);
+            String text = data.getKeyboard().getButtons().get(0).get(2).getAction().getPayload();
+            boolean isMatches = false;
+            for (String s: data.getMessage().getText().split("\\s")) {
+                s = s.toLowerCase();
+                for (String w: words) {
+                    if (s.contains(w)) {
+                        text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
+                        LOG.info("Match on word {}", w);
+                        isMatches = true;
+                        break;
+                    }
+                }
+                if (isMatches) {
+                    break;
+                }
+            }
+//            String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
             //String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getLabel();
             answer.setText(text);
-        } else if (type.equals(CaseType.WARNING) || type.equals(CaseType.ONE_BUTTON_ANSWER)) {
+        } else if (type.equals(CaseType.ONE_BUTTON_ANSWER)) {
+            LOG.debug("{}", CaseType.ONE_BUTTON_ANSWER);
             String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
             answer.setText(text);
         } else if (type.equals(CaseType.LOCATION)) {
+            LOG.debug("{}", CaseType.LOCATION);
             String text = data.getKeyboard().getButtons().get(1).get(0).getAction().getPayload();
             answer.setText(text);
         } else if (type.equals(CaseType.ADS_DV)) {
+            LOG.debug("{}", CaseType.ADS_DV);
             String text = data.getKeyboard().getButtons().get(0).get(1).getAction().getPayload();
             answer.setText(text);
         } else if (type.equals(CaseType.ADVICE)) {
+            LOG.debug("{}", CaseType.ADVICE);
             String text = data.getKeyboard().getButtons().get(0).get(1).getAction().getPayload();
             answer.setText(text);
         } else if (type.equals(CaseType.SLEEPING)) {
+            LOG.debug("{}", CaseType.SLEEPING);
             String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
             answer.setText(text);
         } else if (type.equals(CaseType.PROFILE_LIKED_ME)) {
+            LOG.debug("{}", CaseType.PROFILE_LIKED_ME);
             //@TODO: check if the answer is correct
             String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
             answer.setText(text);
         } else if (type.equals(CaseType.SOMEBODY_LIKES_YOU)) {
+            LOG.debug("{}", CaseType.SOMEBODY_LIKES_YOU);
             //@TODO: check if the answer is correct
             String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
             answer.setText(text);

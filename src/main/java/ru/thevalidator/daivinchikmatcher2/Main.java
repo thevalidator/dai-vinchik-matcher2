@@ -25,47 +25,61 @@ public class Main {
         LOG.info("DAI-VINCHIK-MATCHER 2 -> START");
 
         var context = new AnnotationConfigApplicationContext(SpringJavaConfig.class);
-        //CaseMatcher b = context.getBean(CaseMatcherImpl.class);
-        //b.detectCase()
+        DaiVinchikDialogHandler service = context.getBean(DaiVinchikDialogHandler.class);
+        Thread thread = new Thread(service);
+        thread.start();
+        thread.join();
         System.out.println();
-
-//        TransportClient transportClient = new HttpTransportClientWithCustomUserAgent("Java VK SDK/1.0");
-//        VkApiClient vk = new VkApiClient(transportClient);
-//
-//        Path path = Paths.get("data/config/token");
-//        String token = Files.readString(path);
-//        LOG.debug("Token found: {}", token);
-//        UserAccount account = new UserAccount("user", token);
-//
-//
-//        //UserLongPollSpectatorService service = new UserLongPollSpectatorService(vk, account);
-//        DaiVinchikDialogHandler service = new DaiVinchikDialogHandler(vk, account);
-//
-//        //new thread
-//        Thread thread = new Thread(service);
-//        thread.start();
-//        thread.join();
 
         LOG.info("DAI-VINCHIK-MATCHER 2 -> END");
 
 
-        //new thread by executor service
-//        try (ExecutorService executor = Executors.newFixedThreadPool(10)) {
-//            executor.execute(service);
-//            TimeUnit.SECONDS.sleep(20);
-//            service.stop();
-//            LOG.info("DEACTIVATE INVOKED");
-//        }
-
-
-//        UserAuthResponse authResponse;
-//        try {
-//            authResponse = vk.oAuth()
-//                    .userAuthorizationCodeFlow(APP_ID, CLIENT_SECRET, REDIRECT_URI, code)
-//                    .execute();
-//        } catch (OAuthException e) {
-//            e.getRedirectUri();
-//        }
+//
+//
+//        LOG.info("DAI-VINCHIK-MATCHER 2 -> START");
+//
+//        var context = new AnnotationConfigApplicationContext(SpringJavaConfig.class);
+//        //CaseMatcher b = context.getBean(CaseMatcherImpl.class);
+//        //b.detectCase()
+//        System.out.println();
+//
+////        TransportClient transportClient = new HttpTransportClientWithCustomUserAgent("Java VK SDK/1.0");
+////        VkApiClient vk = new VkApiClient(transportClient);
+////
+////        Path path = Paths.get("data/config/token");
+////        String token = Files.readString(path);
+////        LOG.debug("Token found: {}", token);
+////        UserAccount account = new UserAccount("user", token);
+////
+////
+////        //UserLongPollSpectatorService service = new UserLongPollSpectatorService(vk, account);
+////        DaiVinchikDialogHandler service = new DaiVinchikDialogHandler(vk, account);
+////
+////        //new thread
+////        Thread thread = new Thread(service);
+////        thread.start();
+////        thread.join();
+//
+//        LOG.info("DAI-VINCHIK-MATCHER 2 -> END");
+//
+//
+//        //new thread by executor service
+////        try (ExecutorService executor = Executors.newFixedThreadPool(10)) {
+////            executor.execute(service);
+////            TimeUnit.SECONDS.sleep(20);
+////            service.stop();
+////            LOG.info("DEACTIVATE INVOKED");
+////        }
+//
+//
+////        UserAuthResponse authResponse;
+////        try {
+////            authResponse = vk.oAuth()
+////                    .userAuthorizationCodeFlow(APP_ID, CLIENT_SECRET, REDIRECT_URI, code)
+////                    .execute();
+////        } catch (OAuthException e) {
+////            e.getRedirectUri();
+////        }
 
 
     }
