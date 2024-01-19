@@ -82,6 +82,28 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
             LOG.debug("{}", CaseType.LOCATION);
             String text = data.getKeyboard().getButtons().get(1).get(0).getAction().getPayload();
             answer.setText(text);
+        } else if (type.equals(CaseType.QUESTION_AFTER_PROFILE)) {
+            LOG.debug("{}", CaseType.QUESTION_AFTER_PROFILE); //@TODO: check profile for matching
+            String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
+            answer.setText(text);
+        } else if (type.equals(CaseType.NO_SUCH_ANSWER)) {
+            LOG.debug("{}", CaseType.NO_SUCH_ANSWER);
+            var b =data.getKeyboard().getButtons();
+            String text = b.size() == 1 ? b.get(0).get(0).getAction().getPayload()
+                    : b.get(1).get(0).getAction().getLabel();
+            answer.setText(text);
+        } else if (type.equals(CaseType.LONG_TIME_AWAY)) {
+            LOG.debug("{}", CaseType.LONG_TIME_AWAY);
+            String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
+            answer.setText(text);
+        } else if (type.equals(CaseType.SHOW_QUESTION)) {
+            LOG.debug("{}", CaseType.SHOW_QUESTION);
+            String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
+            answer.setText(text);
+        } else if (type.equals(CaseType.WANT_TO_MEET)) {
+            LOG.debug("{}", CaseType.WANT_TO_MEET);
+            String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
+            answer.setText(text);
         } else if (type.equals(CaseType.ADS_DV)) {
             LOG.debug("{}", CaseType.ADS_DV);
             String text = data.getKeyboard().getButtons().get(0).get(1).getAction().getPayload();
