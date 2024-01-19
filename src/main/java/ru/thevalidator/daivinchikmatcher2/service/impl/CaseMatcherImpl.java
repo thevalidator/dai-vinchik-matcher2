@@ -46,9 +46,9 @@ public class CaseMatcherImpl implements CaseMatcher {
 
         if (isProfile(data)) {
             type = CaseType.PROFILE;
-        } else if (isWarning(data)) {
-            type = CaseType.WARNING;
-        } else if (isQuestion(data)) {
+            //} else if (isWarning(data)) {
+            //    type = CaseType.WARNING;
+        } else if (isOneButton(data)) {
             type = CaseType.ONE_BUTTON_ANSWER;
         } else if (isLocation(data)) {
             type = CaseType.LOCATION;
@@ -56,22 +56,26 @@ public class CaseMatcherImpl implements CaseMatcher {
             type = CaseType.ADS_DV;
         } else if (isAdvice(data)) {
             type = CaseType.ADVICE;
-        } else if (isTooMuchForToday(data)) {
-            type = CaseType.TOO_MANY_LIKES;
         } else if (isWantToMeet(data)) {
             type = CaseType.WANT_TO_MEET;
         } else if (hasLikeFromSomeone(data)) {
             type = CaseType.SOMEBODY_LIKES_YOU;
+        } else if (isQuestionAfterProfile(data)) {
+            type = CaseType.QUESTION_AFTER_PROFILE;
         } else if (isSleeping(data)) {
             type = CaseType.SLEEPING;
         } else if (isShowQuestion(data)) {
             type = CaseType.SHOW_QUESTION;
-        } else if (isLongTimeAway(data)) {
-            type = CaseType.LONG_TIME_AWAY;
         } else if (isProfileLikedMe(data)) {
             type = CaseType.PROFILE_LIKED_ME;
         } else if (isProfileUrl(data)) {
             type = CaseType.PROFILE_URL;
+        } else if (isTooMuchForToday(data)) {
+            type = CaseType.TOO_MANY_LIKES;
+        } else if (isLongTimeAway(data)) {
+            type = CaseType.LONG_TIME_AWAY;
+        } else if (isNoSuchAnswer(data)) {
+            type = CaseType.NO_SUCH_ANSWER;
         }
 
 
@@ -136,15 +140,15 @@ public class CaseMatcherImpl implements CaseMatcher {
                 && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.DEFAULT.getValue());
     }
 
-    public boolean isQuestion(MessageAndKeyboard data) {
+    public boolean isOneButton(MessageAndKeyboard data) {
         Keyboard keyboard = data.getKeyboard();
         List<List<KeyboardButton>> buttonRows = keyboard.getButtons();
         return !keyboard.getOneTime()
                 && buttonRows.size() == 1
                 && buttonRows.get(0).size() == 1
-                && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
-                //&& buttonRows.get(0).get(0).getAction().getLabel().equals("Продолжить просмотр анкет")
-                && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.POSITIVE.getValue());
+                && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue());
+        //&& buttonRows.get(0).get(0).getAction().getLabel().equals("Продолжить просмотр анкет")
+        //&& buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.POSITIVE.getValue());
     }
 
     public boolean isLocation(MessageAndKeyboard data) {
@@ -235,6 +239,28 @@ public class CaseMatcherImpl implements CaseMatcher {
                 && buttonRows.get(0).get(1).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
                 && buttonRows.get(0).get(1).getColor().equals(KeyboardButtonColor.DEFAULT.getValue())
                 && message.getText().contains("показать");//"Ты понравился 1 человеку, показать его?"
+    }
+
+    private boolean isQuestionAfterProfile(MessageAndKeyboard data) {
+        Message message = data.getMessage();
+//        Keyboard keyboard = data.getKeyboard();
+//        List<List<KeyboardButton>> buttonRows = keyboard.getButtons();
+//        return !keyboard.getOneTime()
+//                && buttonRows.size() == 1
+//                && buttonRows.get(0).size() == 2
+//                && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+//                && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.POSITIVE.getValue())
+//                && buttonRows.get(0).get(1).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+//                && buttonRows.get(0).get(1).getColor().equals(KeyboardButtonColor.DEFAULT.getValue())
+//                && message.getText().contains("Заканчивай с вопросом выше");
+                return message.getText().contains("Заканчивай с вопросом выше");
+        //"Нашли кое-кого для тебя ;) Заканчивай с вопросом выше и увидишь кто это"
+    }
+
+    private boolean isNoSuchAnswer(MessageAndKeyboard data) {
+        Message message = data.getMessage();
+                return message.getText().contains("Нет такого варианта ответа");
+        //"Нет такого варианта ответа"
     }
 
     public boolean isSleeping(MessageAndKeyboard data) {
