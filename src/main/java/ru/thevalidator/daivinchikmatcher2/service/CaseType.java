@@ -10,6 +10,7 @@ public enum CaseType {
     LOCATION,
     ADS_DV,
     ADVICE,
+    QUESTION,
     SLEEPING,
     TOO_MANY_LIKES,
     CAN_NOT_CONTINUE,

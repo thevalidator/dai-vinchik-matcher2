@@ -50,7 +50,6 @@ public class DaiVinchikDialogHandler implements Task {
         LOG.debug("Start task");
         MessageAndKeyboard data;
         Integer lastConversationMessageId = messageService.getDaiVinchikLastConversationMessageId();
-        LOG.debug("Conversation last message id: {}", lastConversationMessageId);
         int messageDelta;
         while (isActive) {
             try {
@@ -72,7 +71,7 @@ public class DaiVinchikDialogHandler implements Task {
                 SendMessageResultResponse resultRs = messageService.sendMessage(answer);
                 //@TODO: check for response errors
                 lastConversationMessageId = resultRs.getConversationMessageId();
-                System.out.printf("[%d] CASE: %s | ANSWER: %s | SLEEPING 12 SECONDS\n",
+                System.out.printf("[%03d] CASE: %s | ANSWER: %s | SLEEPING 12 SECONDS\n",
                         counter, answer.getType(), answer.getText());
                 TimeUnit.SECONDS.sleep(12);
             } catch (TooManyLikesForToday e) {

@@ -25,7 +25,7 @@ public class CaseMatcherImpl implements CaseMatcher {
             "(?<name>([\\p{L}\\p{N}\\p{P}\\p{Z}\\W$^+=|`~№]+)?,) " +
                     "(?<age>\\d{1,3},) " +
                     "(?<city>[\\p{L}\\p{N}\\p{P}\\p{Z}$^+=|`~№]+)" +
-                    "(?<text>(((<br>)|\\n)+.*)*)";
+                    "(?<text>(((<br>)|\\n)*.*)*)";
 
 
     public boolean isSympathyKeyboardPattern(com.vk.api.sdk.objects.messages.Keyboard keyboard) {
@@ -56,6 +56,8 @@ public class CaseMatcherImpl implements CaseMatcher {
             type = CaseType.ADS_DV;
         } else if (isAdvice(data)) {
             type = CaseType.ADVICE;
+        } else if (isQuestion(data)) {
+            type = CaseType.QUESTION;
         } else if (isWantToMeet(data)) {
             type = CaseType.WANT_TO_MEET;
         } else if (hasLikeFromSomeone(data)) {
@@ -191,6 +193,21 @@ public class CaseMatcherImpl implements CaseMatcher {
                 && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.POSITIVE.getValue())
                 && buttonRows.get(0).get(1).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
                 && buttonRows.get(0).get(1).getColor().equals(KeyboardButtonColor.DEFAULT.getValue())
+                && !message.getText().contains("Ты понравил");   //@TODO: improve text check conditions;
+    }
+
+    public boolean isQuestion(MessageAndKeyboard data) {
+        Message message = data.getMessage();
+        Keyboard keyboard = data.getKeyboard();
+        List<List<KeyboardButton>> buttonRows = keyboard.getButtons();
+        return !keyboard.getOneTime()
+                && buttonRows.size() == 2
+                && buttonRows.get(0).size() == 1
+                && buttonRows.get(1).size() == 1
+                && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.POSITIVE.getValue())
+                && buttonRows.get(1).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && buttonRows.get(1).get(0).getColor().equals(KeyboardButtonColor.DEFAULT.getValue())
                 && !message.getText().contains("Ты понравил");   //@TODO: improve text check conditions;
     }
 
