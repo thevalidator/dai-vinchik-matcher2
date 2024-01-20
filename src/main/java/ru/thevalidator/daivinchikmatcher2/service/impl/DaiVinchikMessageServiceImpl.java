@@ -14,6 +14,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import ru.thevalidator.daivinchikmatcher2.config.settings.Settings;
+import ru.thevalidator.daivinchikmatcher2.exception.CanNotContinueException;
 import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMessageService;
 import ru.thevalidator.daivinchikmatcher2.util.data.SerializerUtil;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.DaiVinchikDialogAnswer;
@@ -25,6 +26,7 @@ import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.Conve
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keyboard.Keyboard;
 
 import java.util.List;
+import java.util.Objects;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -45,7 +47,24 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
         Conversation c = getDaiVinchikConversation();
         Keyboard keyboard = c.getCurrentKeyboard();
         Message message = getMessageById(c.getLastMessageId());
+        if (isNotFromDaiVinchik(message.getFromId())) {
+            LOG.debug("Message is not from DaiVinchik: {}", message);
+            message = findMessageFromDaiVinchikBefore(message);
+        }
         return new MessageAndKeyboard(message, keyboard);
+    }
+
+    @Override
+    public Message findMessageFromDaiVinchikBefore(Message fromMessage) {
+        int previousConversationMsgId = fromMessage.getConversationMessageId() - 1;
+        Message message;
+        do {
+            if (previousConversationMsgId <= 0) {
+                throw new CanNotContinueException("Conversation ID is equals zero");
+            }
+            message = getDaiVinchikMessagesByConversationId(List.of(previousConversationMsgId--)).get(0);
+        } while (isNotFromDaiVinchik(message.getFromId()));
+        return message;
     }
 
     @Override
@@ -84,10 +103,14 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
             LOG.debug("Send message result response: {}", rs);
             return rs;
         } catch (Exception e) {
-        //} catch (ApiException | ClientException e) {
+            //} catch (ApiException | ClientException e) {
             throw new RuntimeException(e);
         }
         //throw new UnsupportedOperationException("Not supported yet");
+    }
+
+    private boolean isNotFromDaiVinchik(Long fromId) {
+        return !Objects.equals(fromId, Settings.INSTANCE.getDaiVinchickPeerId());
     }
 
     private Conversation getDaiVinchikConversation() {

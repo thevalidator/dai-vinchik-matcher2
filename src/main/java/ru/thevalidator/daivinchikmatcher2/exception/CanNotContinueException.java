@@ -11,6 +11,11 @@ public class CanNotContinueException extends RuntimeException {
         this.data = data;
     }
 
+    public CanNotContinueException(String errorMessage) {
+        super(errorMessage);
+        data = null;
+    }
+
     public MessageAndKeyboard getData() {
         return data;
     }

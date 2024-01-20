@@ -21,7 +21,7 @@ public class Main {
 
     public static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
-    public static void main(String[] args) throws InterruptedException, IOException {
+    public static void main(String[] args) throws InterruptedException {
         LOG.info("DAI-VINCHIK-MATCHER 2 -> START");
 
         var context = new AnnotationConfigApplicationContext(SpringJavaConfig.class);

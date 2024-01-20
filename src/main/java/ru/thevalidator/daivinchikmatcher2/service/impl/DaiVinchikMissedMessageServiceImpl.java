@@ -24,6 +24,7 @@ public class DaiVinchikMissedMessageServiceImpl implements DaiVinchikMissedMessa
                 LOG.debug("profile: {}", matcher.group("url"));
             }
         } else {
+            //@TODO: remove in future if sympathy detection works fine
             LOG.debug("Unknown missed message type: {}", message);
         }
     }

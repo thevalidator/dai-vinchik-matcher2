@@ -7,15 +7,15 @@
 - [x] ~~add logging~~
 - [x] ~~add long poll spectator~~
 - [x] ~~add spring context~~
-- [ ] fix answer duplication
+- [x] ~~fix answer duplication~~
 - [ ] set userID in custom actor after connect
-- [ ] check if DV not answered
-- [ ] get missed messages
-- [ ] collect profile links
+- [ ] check if DV not answered ()
+- [x] ~~get missed messages~~
+- [x] ~~collect profile links~~
 - [ ] save account data to db with profiles url
 - [ ] send messages for mutual liked profiles if they didn't text first
 - [ ] profile creator service
-- [ ] return missed messages without last one 
+- [x] ~~return missed messages without last one~~
 - [ ] feature 1
 - [ ] feature 1
 - [ ] feature 1

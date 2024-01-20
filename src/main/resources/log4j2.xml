@@ -36,6 +36,7 @@
         </Logger>
         <Logger name="ru.thevalidator.daivinchikmatcher2.service.impl.DaiVinchikMissedMessageServiceImpl" level="debug" additivity="false">
             <AppenderRef ref="Missed"/>
+            <AppenderRef ref="Console"/>
         </Logger>
 
 <!--        <Logger name="ru.thevalidator.daivinchikmatcher2.task.longpoll" level="debug"/>-->

@@ -28,7 +28,6 @@ public class DaiVinchikDialogHandler implements Task {
 
     private static final Logger LOG = LoggerFactory.getLogger(DaiVinchikDialogHandler.class);
     private final DaiVinchikMessageService messageService;
-    private static final Integer LAST_MESSAGES_COUNT = 5;
     private final DaiVinchikDialogAnswerService answerService;
     private final DaiVinchikMissedMessageService missedMessageService;
     private final Statistic stats;
@@ -73,8 +72,8 @@ public class DaiVinchikDialogHandler implements Task {
                 SendMessageResultResponse resultRs = messageService.sendMessage(answer);
                 //@TODO: check for response errors
                 lastConversationMessageId = resultRs.getConversationMessageId();
-
-                System.out.println("[" + counter + "] SLEEPING 12 SECONDS");
+                System.out.printf("[%d] CASE: %s | ANSWER: %s | SLEEPING 12 SECONDS\n",
+                        counter, answer.getType(), answer.getText());
                 TimeUnit.SECONDS.sleep(12);
             } catch (TooManyLikesForToday e) {
                 isActive = false;

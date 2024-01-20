@@ -10,10 +10,14 @@ import java.util.List;
 public interface DaiVinchikMessageService {
 
     public MessageAndKeyboard getDaiVinchikLastMessageAndKeyboard();
+
     public MessageAndKeyboard getDaiVinchikMessageById(Integer id); //@TODO: probably no need to return message with keyboard
 
-    public Integer getDaiVinchikLastConversationMessageId();
+    public Message findMessageFromDaiVinchikBefore(Message message);
+
     public List<Message> getDaiVinchikMessagesByConversationId(List<Integer> ids);
+
+    public Integer getDaiVinchikLastConversationMessageId();
 
     public SendMessageResultResponse sendMessage(DaiVinchikDialogAnswer answer);
 
