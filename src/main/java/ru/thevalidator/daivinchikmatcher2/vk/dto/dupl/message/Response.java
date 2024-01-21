@@ -1,9 +1,7 @@
 package ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Response {
+
     private GetConversationsByIdResponse response;
 
     public GetConversationsByIdResponse getResponse() {
@@ -13,4 +11,5 @@ public class Response {
     public void setResponse(GetConversationsByIdResponse response) {
         this.response = response;
     }
+
 }

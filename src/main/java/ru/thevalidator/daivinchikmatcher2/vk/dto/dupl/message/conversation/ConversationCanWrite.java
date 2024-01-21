@@ -1,10 +1,7 @@
 package ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.google.gson.annotations.SerializedName;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class ConversationCanWrite {
+
     private Boolean allowed;
 
     private Integer reason;
@@ -32,4 +29,5 @@ public class ConversationCanWrite {
                 ", reason=" + reason +
                 '}';
     }
+
 }

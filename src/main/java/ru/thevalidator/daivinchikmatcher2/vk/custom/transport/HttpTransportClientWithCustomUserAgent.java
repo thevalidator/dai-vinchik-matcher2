@@ -9,10 +9,18 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+@Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class HttpTransportClientWithCustomUserAgent extends HttpTransportClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpTransportClientWithCustomUserAgent.class);
+
+    @Autowired
     public HttpTransportClientWithCustomUserAgent(String userAgent) {
         LOG.debug("Trying to create http client with custom user agent [{}]", userAgent);
         httpClient = buildHttpClientWithUserAgent(userAgent);
@@ -39,4 +47,5 @@ public class HttpTransportClientWithCustomUserAgent extends HttpTransportClient 
                 .setUserAgent(userAgent)
                 .build();
     }
+
 }

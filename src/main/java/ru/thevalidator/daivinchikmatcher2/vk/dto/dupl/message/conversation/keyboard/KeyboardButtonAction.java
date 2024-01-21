@@ -1,9 +1,7 @@
 package ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keyboard;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class KeyboardButtonAction {
+
     private String label;
 
     private String payload;
@@ -53,4 +51,5 @@ public class KeyboardButtonAction {
                 ", link='" + link + '\'' +
                 '}';
     }
+
 }

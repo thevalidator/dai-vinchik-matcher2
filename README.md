@@ -6,11 +6,16 @@
 - [x] ~~add VK lib~~
 - [x] ~~add logging~~
 - [x] ~~add long poll spectator~~
+- [x] ~~add spring context~~
+- [x] ~~fix answer duplication~~
 - [ ] set userID in custom actor after connect
-- [ ] feature 3
-- [ ] feature 3
-- [ ] feature 3
-- [ ] feature 3
+- [ ] check if DV not answered ()
+- [x] ~~get missed messages~~
+- [x] ~~collect profile links~~
+- [ ] save account data to db with profiles url
+- [ ] send messages for mutual liked profiles if they didn't text first
+- [ ] profile creator service
+- [x] ~~return missed messages without last one~~
 - [ ] feature 1
 - [ ] feature 1
 - [ ] feature 1

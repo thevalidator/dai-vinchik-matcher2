@@ -1,18 +1,21 @@
 package ru.thevalidator.daivinchikmatcher2.util.data;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.LongPollServerResponse;
 
 public class SerializerUtil {
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final Gson mapper = new Gson();
 
-    public static LongPollServerResponse readLongPollResponse(String response) throws JsonProcessingException {
-        return mapper.readValue(response, LongPollServerResponse.class);
+    public static LongPollServerResponse readLongPollResponse(String response) {
+        return mapper.fromJson(response, LongPollServerResponse.class);
     }
 
-    public static ObjectMapper getMapper() {
-        return mapper;
+    public static String writeJson(Object o) {
+        return mapper.toJson(o);
+    }
+
+    public static <T> T readJson(String json, Class<T> className) {
+        return mapper.fromJson(json, className);
     }
 
 }

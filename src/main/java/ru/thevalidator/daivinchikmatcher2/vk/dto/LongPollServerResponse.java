@@ -1,14 +1,9 @@
 package ru.thevalidator.daivinchikmatcher2.vk.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
-
 import java.util.List;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class LongPollServerResponse {
+
     private Integer ts;
     private Integer pts;
     private List<List<Object>> updates;
@@ -66,4 +61,5 @@ public class LongPollServerResponse {
     public void setMaxVersion(Integer maxVersion) {
         this.maxVersion = maxVersion;
     }
+
 }
