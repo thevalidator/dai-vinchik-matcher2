@@ -21,7 +21,7 @@ public class DaiVinchikMissedMessageServiceImpl implements DaiVinchikMissedMessa
         if (isSympathyKeyboardPattern(message.getKeyboard())) {
             Matcher matcher = pattern.matcher(message.getText());
             if (matcher.find()) {
-                LOG.debug("profile: {}", matcher.group("url"));
+                saveProfileUrl(matcher.group("url"));
             }
         } else {
             //@TODO: remove in future if sympathy detection works fine
@@ -36,4 +36,7 @@ public class DaiVinchikMissedMessageServiceImpl implements DaiVinchikMissedMessa
                 && keyboard.getButtons().get(0).size() == 1;
     }
 
+    private void saveProfileUrl(String url) {
+        LOG.debug("profile: {}", url);
+    }
 }
