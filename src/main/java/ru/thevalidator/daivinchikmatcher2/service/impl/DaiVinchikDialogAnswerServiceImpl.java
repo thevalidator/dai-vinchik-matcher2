@@ -96,9 +96,12 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
         } else if (type.equals(CaseType.ADS_DV)) {
 //            LOG.debug("{}", CaseType.ADS_DV);
             text = data.getKeyboard().getButtons().get(0).get(1).getAction().getPayload();
-        } else if (type.equals(CaseType.ADVICE) || type.equals(CaseType.QUESTION)) {
+        } else if (type.equals(CaseType.ADVICE)) {
 //            LOG.debug("{}", CaseType.ADVICE);
             text = data.getKeyboard().getButtons().get(0).get(1).getAction().getPayload();
+        } else if (type.equals(CaseType.QUESTION)) {
+//            LOG.debug("{}", CaseType.QUESTION);
+            text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
         } else if (type.equals(CaseType.SLEEPING)) {
 //            LOG.debug("{}", CaseType.SLEEPING);
             text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
@@ -127,7 +130,7 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
             text = sc.nextLine();
             System.out.println();
         }
-        return text;
+        return text; //@TODO: answer-duplication case
     }
 
     private String getAnswerForProfile(MessageAndKeyboard data) {
