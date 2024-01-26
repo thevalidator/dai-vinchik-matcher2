@@ -21,13 +21,13 @@ import java.util.Objects;
 public class CaseMatcherImpl implements CaseMatcher {
 
     private static final Logger LOG = LoggerFactory.getLogger(CaseMatcherImpl.class);
-    private static final String PROFILE_REGEXP = //"([\\p{L}\\p{N}\\p{P}\\p{Z}\\W$^+=|`~№]+(<br>|\\n)+)?" +
-            "(?<name>([\\p{L}\\p{N}\\p{P}\\p{Z}\\W$^+=|`~№]+)?,) " +
+    private static final String PROFILE_REGEXP = "(?<name>([\\p{L}\\p{N}\\p{P}\\p{Z}\\W$^+=|`~№]+)?,) " +
                     "(?<age>\\d{1,3},) " +
                     "(?<city>[\\p{L}\\p{N}\\p{P}\\p{Z}$^+=|`~№]+)" +
                     "(?<text>(((<br>)|\\n)*.*)*)";
 
 
+    //@TODO: move sympathy checking here or not ???
     public boolean isSympathyKeyboardPattern(com.vk.api.sdk.objects.messages.Keyboard keyboard) {
         return keyboard != null
                 && keyboard.getInline()

@@ -16,8 +16,8 @@
 - [ ] send messages for mutual liked profiles if they didn't text first
 - [ ] profile creator service
 - [x] ~~return missed messages without last one~~
-- [ ] feature 1
-- [ ] feature 1
-- [ ] feature 1
+- [ ] handle inactive
+- [ ] handle question-after-inactive
+- [ ] message service impl line 142: check what if no new messages
 - [ ] feature 2
 - [ ] feature 3
