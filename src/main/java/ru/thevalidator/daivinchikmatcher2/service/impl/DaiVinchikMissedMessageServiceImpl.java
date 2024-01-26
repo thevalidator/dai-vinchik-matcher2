@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 public class DaiVinchikMissedMessageServiceImpl implements DaiVinchikMissedMessageService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DaiVinchikMissedMessageServiceImpl.class);
-    private static final Pattern pattern = Pattern.compile("\\W+друзья - (?<url>vk.com/id\\d+)\\n");
+    private static final Pattern pattern = Pattern.compile("\\W+друзья - (?<url>vk.com/id\\d+)");
 
     @Override
     public void findSympathy(Message message) {
