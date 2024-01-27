@@ -17,6 +17,7 @@ import ru.thevalidator.daivinchikmatcher2.task.request.DaiVinchikDialogHandler;
 import ru.thevalidator.daivinchikmatcher2.vk.custom.actor.CustomUserActor;
 import ru.thevalidator.daivinchikmatcher2.vk.custom.transport.HttpTransportClientWithCustomUserAgent;
 
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
@@ -25,22 +26,25 @@ public class DaiVinchikDialogHandlerFactory implements FactoryBean<DaiVinchikDia
     private final UserTokenRepository tokenRepository;
     private final DaiVinchikMissedMessageService missedMessageService;
     private final CaseMatcher caseMatcher;
+    private final Set<String> matchingWords;
     private static final AtomicInteger counter = new AtomicInteger(0);
 
     @Autowired
     public DaiVinchikDialogHandlerFactory(UserTokenRepository tokenRepository,
                                           DaiVinchikMissedMessageService missedMessageService,
-                                          CaseMatcher caseMatcher) {
+                                          CaseMatcher caseMatcher,
+                                          Set<String> matchingWords) {
         this.tokenRepository = tokenRepository;
         this.missedMessageService = missedMessageService;
         this.caseMatcher = caseMatcher;
+        this.matchingWords = matchingWords;
     }
 
     @Override
     public DaiVinchikDialogHandler getObject() {
 
         String token = tokenRepository.getTokens().poll();
-        if (counter.incrementAndGet() > 2 || token == null) { //@TODO: token null separate check, add queue is empty check
+        if (counter.incrementAndGet() > 2 || token == null) { //@TODO: 'token null' separate check, add 'queue is empty' check
             throw new RuntimeException("Too many handlers");
         }
 
@@ -49,7 +53,8 @@ public class DaiVinchikDialogHandlerFactory implements FactoryBean<DaiVinchikDia
         UserActor actor = new CustomUserActor(token);
         DaiVinchikMessageService messageService = new DaiVinchikMessageServiceImpl(vk, actor);
 
-        DaiVinchikDialogAnswerService answerService = new DaiVinchikDialogAnswerServiceImpl(caseMatcher, messageService);
+        DaiVinchikDialogAnswerService answerService = new DaiVinchikDialogAnswerServiceImpl(
+                caseMatcher, messageService, matchingWords);
 
         System.out.println(">>> CREATED: " + token);
         return new DaiVinchikDialogHandler(messageService, answerService, missedMessageService);
@@ -63,7 +68,6 @@ public class DaiVinchikDialogHandlerFactory implements FactoryBean<DaiVinchikDia
     @Override
     public boolean isSingleton() {
         return true;
-        //return false;
         //return !FactoryBean.super.isSingleton();
     }
 
