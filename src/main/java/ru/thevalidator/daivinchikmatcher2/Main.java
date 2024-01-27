@@ -1,35 +1,43 @@
 package ru.thevalidator.daivinchikmatcher2;
 
-import com.vk.api.sdk.client.TransportClient;
-import com.vk.api.sdk.client.VkApiClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import ru.thevalidator.daivinchikmatcher2.account.UserAccount;
+import ru.thevalidator.daivinchikmatcher2.config.DaiVinchikDialogHandlerFactory;
 import ru.thevalidator.daivinchikmatcher2.config.SpringJavaConfig;
-import ru.thevalidator.daivinchikmatcher2.service.CaseMatcher;
-import ru.thevalidator.daivinchikmatcher2.service.impl.CaseMatcherImpl;
 import ru.thevalidator.daivinchikmatcher2.task.request.DaiVinchikDialogHandler;
-import ru.thevalidator.daivinchikmatcher2.vk.custom.transport.HttpTransportClientWithCustomUserAgent;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
 
     public static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws Exception {
         LOG.info("DAI-VINCHIK-MATCHER 2 -> START");
 
+        //single-thread
+//        var context = new AnnotationConfigApplicationContext(SpringJavaConfig.class);
+//        DaiVinchikDialogHandler service = context.getBean(DaiVinchikDialogHandler.class);
+
+//        Thread thread = new Thread(service);
+//        thread.start();
+//        thread.join();
+
+        // concurrent
         var context = new AnnotationConfigApplicationContext(SpringJavaConfig.class);
-        DaiVinchikDialogHandler service = context.getBean(DaiVinchikDialogHandler.class);
+        DaiVinchikDialogHandlerFactory factory = context.getBean(DaiVinchikDialogHandlerFactory.class);
+
+        DaiVinchikDialogHandler service = factory.getObject();
+        DaiVinchikDialogHandler service2 = factory.getObject();
+
         Thread thread = new Thread(service);
+        Thread thread2 = new Thread(service2);
         thread.start();
+        TimeUnit.SECONDS.sleep(6);
+        thread2.start();
         thread.join();
-        System.out.println();
+        thread2.join();
 
         LOG.info("DAI-VINCHIK-MATCHER 2 -> END");
 
