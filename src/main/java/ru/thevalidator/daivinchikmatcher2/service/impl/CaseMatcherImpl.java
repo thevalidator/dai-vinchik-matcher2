@@ -37,7 +37,7 @@ public class CaseMatcherImpl implements CaseMatcher {
 
     @Override
     public CaseType detectCase(MessageAndKeyboard data) {
-        CaseType type;
+        CaseType type = CaseType.UNKNOWN;
 
         LOG.trace("MESSAGE: {}", data);
         if (Objects.isNull(data.getKeyboard())) {
@@ -93,7 +93,6 @@ public class CaseMatcherImpl implements CaseMatcher {
 
 
         else {
-            type = CaseType.UNKNOWN;
             LOG.debug("{} MESSAGE TYPE: {}", type, data);
         }
 
@@ -148,7 +147,8 @@ public class CaseMatcherImpl implements CaseMatcher {
         return !keyboard.getOneTime()
                 && buttonRows.size() == 1
                 && buttonRows.get(0).size() == 1
-                && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue());
+                && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && !buttonRows.get(0).get(0).getAction().getPayload().isBlank();
         //&& buttonRows.get(0).get(0).getAction().getLabel().equals("Продолжить просмотр анкет")
         //&& buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.POSITIVE.getValue());
     }
