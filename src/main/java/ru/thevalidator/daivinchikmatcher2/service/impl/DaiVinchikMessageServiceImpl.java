@@ -46,6 +46,9 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
     public MessageAndKeyboard getDaiVinchikLastMessageAndKeyboard() {
         Conversation c = getDaiVinchikConversation();
         Keyboard keyboard = c.getCurrentKeyboard();
+        if (keyboard == null) {
+            LOG.warn("Keyboard is null!");
+        }
         Message message = getMessageById(c.getLastMessageId());
         if (isNotFromDaiVinchik(message.getFromId())) {
             LOG.debug("Message is not from DaiVinchik: {}", message);
@@ -141,7 +144,7 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
                     .execute();
             LOG.debug("Receive messages by id response: {}", rs.toString());
             //@TODO: extract method for checking
-            if (rs.getCount() > 1) {
+            if (rs.getCount() > 1 || rs.getCount() == 0) {
                 throw new IllegalArgumentException("Count=" + rs.getCount() + ", but should be 1");
             }
             return rs.getItems().get(0);
