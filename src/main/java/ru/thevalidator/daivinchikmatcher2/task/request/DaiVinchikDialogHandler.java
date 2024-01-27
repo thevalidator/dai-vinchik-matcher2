@@ -79,8 +79,10 @@ public class DaiVinchikDialogHandler implements Task {
                         stats.increaseDislikes();
                     }
                 }
-                System.out.printf("[%03d] (L_%03d/D_%03d) CASE: %s | ANSWER: %s | SLEEPING 12 SECONDS\n",
-                        counter, stats.getLikes(), stats.getDislikes(), answer.getType(), answer.getText());
+                System.out.printf("[%s] [%03d] (L_%03d/D_%03d) CASE: %s | ANSWER: %s | SLEEPING 12 SECONDS\n",
+                        Thread.currentThread().getName(), counter,
+                        stats.getLikes(), stats.getDislikes(),
+                        answer.getType(), answer.getText());
                 TimeUnit.SECONDS.sleep(12);
             } catch (TooManyLikesForToday e) {
                 isActive = false;
