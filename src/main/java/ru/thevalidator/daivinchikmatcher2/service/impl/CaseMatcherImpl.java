@@ -22,9 +22,9 @@ public class CaseMatcherImpl implements CaseMatcher {
 
     private static final Logger LOG = LoggerFactory.getLogger(CaseMatcherImpl.class);
     private static final String PROFILE_REGEXP = "(?<name>([\\p{L}\\p{N}\\p{P}\\p{Z}\\W$^+=|`~№]+)?,) " +
-                    "(?<age>\\d{1,3},) " +
-                    "(?<city>[\\p{L}\\p{N}\\p{P}\\p{Z}$^+=|`~№]+)" +
-                    "(?<text>(((<br>)|\\n)*.*)*)";
+            "(?<age>\\d{1,3},) " +
+            "(?<city>[\\p{L}\\p{N}\\p{P}\\p{Z}$^+=|`~№]+)" +
+            "(?<text>(((<br>)|\\n)*.*)*)";
 
 
     //@TODO: move sympathy checking here or not ???
@@ -78,6 +78,8 @@ public class CaseMatcherImpl implements CaseMatcher {
             type = CaseType.LONG_TIME_AWAY;
         } else if (isNoSuchAnswer(data)) {
             type = CaseType.NO_SUCH_ANSWER;
+        } else if (isQuestionAfterInactive(data)) {
+            type = CaseType.QUESTION_AFTER_INACTIVE;
         }
 
 
@@ -270,13 +272,13 @@ public class CaseMatcherImpl implements CaseMatcher {
 //                && buttonRows.get(0).get(1).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
 //                && buttonRows.get(0).get(1).getColor().equals(KeyboardButtonColor.DEFAULT.getValue())
 //                && message.getText().contains("Заканчивай с вопросом выше");
-                return message.getText().contains("Заканчивай с вопросом выше");
+        return message.getText().contains("Заканчивай с вопросом выше");
         //"Нашли кое-кого для тебя ;) Заканчивай с вопросом выше и увидишь кто это"
     }
 
     private boolean isNoSuchAnswer(MessageAndKeyboard data) {
         Message message = data.getMessage();
-                return message.getText().contains("Нет такого варианта ответа");
+        return message.getText().contains("Нет такого варианта ответа");
         //"Нет такого варианта ответа"
     }
 
@@ -331,6 +333,21 @@ public class CaseMatcherImpl implements CaseMatcher {
                 && buttonRows.get(0).get(2).getColor().equals(KeyboardButtonColor.DEFAULT.getValue())
                 && message.getText().contains("анкета больше не участвует в поиске");
         //&& message.getText().endsWith("3. Я больше никого не ищу.");
+    }
+
+    private boolean isQuestionAfterInactive(MessageAndKeyboard data) {
+        Keyboard keyboard = data.getKeyboard();
+        List<List<KeyboardButton>> buttonRows = keyboard.getButtons();
+
+        return !keyboard.getOneTime()
+                && buttonRows.size() == 2
+                && buttonRows.get(0).size() == 4
+                && buttonRows.get(1).size() == 1
+                && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.NEGATIVE.getValue())
+                && buttonRows.get(1).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && buttonRows.get(1).get(0).getColor().equals(KeyboardButtonColor.POSITIVE.getValue())
+                && buttonRows.get(1).get(0).getAction().getLabel().contains("Смотреть анкеты");
     }
 
     public boolean isProfileUrl(MessageAndKeyboard data) {

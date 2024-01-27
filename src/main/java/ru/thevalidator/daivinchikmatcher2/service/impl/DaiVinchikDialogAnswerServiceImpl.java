@@ -4,6 +4,7 @@ import com.vk.api.sdk.objects.messages.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import ru.thevalidator.daivinchikmatcher2.exception.CanNotContinueException;
 import ru.thevalidator.daivinchikmatcher2.exception.TooManyLikesForToday;
@@ -14,43 +15,25 @@ import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMessageService;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.DaiVinchikDialogAnswer;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
+@Lazy
 @Component
 public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswerService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DaiVinchikDialogAnswerServiceImpl.class);
     private final CaseMatcher matcher;
     private final DaiVinchikMessageService messageService;
-    private Set<String> words;
+    private final Set<String> matchingWords;
 
     @Autowired
-    public DaiVinchikDialogAnswerServiceImpl(CaseMatcher matcher, DaiVinchikMessageService messageService) {
+    public DaiVinchikDialogAnswerServiceImpl(CaseMatcher matcher,
+                                             DaiVinchikMessageService messageService,
+                                             Set<String> matchingWords) {
         this.matcher = matcher;
         this.messageService = messageService;
-        initWords();
-    }
-
-    private void initWords() {
-        words = new HashSet<>();
-        try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(new FileInputStream("data/words.txt"),
-                        StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                words.add(line.trim().toLowerCase());
-            }
-        } catch (IOException ex) {
-            LOG.error(ex.getMessage());
-        }
-        LOG.info("Loaded {} words for matching", words.size());
+        this.matchingWords = matchingWords;
     }
 
     @Override
@@ -130,7 +113,9 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
             text = sc.nextLine();
             System.out.println();
         }
-        return text; //@TODO: answer-duplication case
+        return text;
+        //@TODO: answer-duplication case
+        //@TODO: add question after inactive
     }
 
     private String getAnswerForProfile(MessageAndKeyboard data) {
@@ -138,7 +123,7 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
         boolean isMatches = false;
         for (String s: data.getMessage().getText().split("\\s")) {
             s = s.toLowerCase();
-            for (String w: words) {
+            for (String w: matchingWords) {
                 if (s.contains(w)) {
                     text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
                     LOG.info("Match on word {}", w);

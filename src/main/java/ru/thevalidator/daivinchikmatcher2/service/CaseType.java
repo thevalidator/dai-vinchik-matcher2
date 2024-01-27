@@ -22,9 +22,7 @@ public enum CaseType {
     ONE_BUTTON_ANSWER,
     NO_SUCH_ANSWER,
     QUESTION_AFTER_PROFILE,
-
-
-
+    QUESTION_AFTER_INACTIVE,
 
 
 //    START_MESSAGE,
@@ -39,7 +37,6 @@ public enum CaseType {
 //    SKIP_BUTTON,
 //    SKIP_TEXT,
 //+++    CAN_NOT_CONTINUE,
-
 
 
     CAPTCHA
