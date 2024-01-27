@@ -19,5 +19,8 @@
 - [ ] handle inactive
 - [ ] handle question-after-inactive
 - [ ] message service impl line 142: check what if no new messages
-- [ ] feature 2
+- [ ] fix answer for 2 buttons profile correct prompt
+- [ ] feature 3
+- [ ] feature 3
+- [ ] feature 3
 - [ ] feature 3
