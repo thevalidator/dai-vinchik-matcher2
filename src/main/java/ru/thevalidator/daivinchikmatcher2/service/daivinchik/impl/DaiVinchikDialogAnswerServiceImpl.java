@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.thevalidator.daivinchikmatcher2.exception.CanNotContinueException;
 import ru.thevalidator.daivinchikmatcher2.exception.TooManyLikesForToday;
-import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikCaseMatcher;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikCaseMatcherService;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikDialogAnswerService;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikMessageService;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.CaseType;
@@ -18,11 +18,11 @@ import java.util.Set;
 public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswerService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DaiVinchikDialogAnswerServiceImpl.class);
-    private final DaiVinchikCaseMatcher matcher;
+    private final DaiVinchikCaseMatcherService matcher;
     private final DaiVinchikMessageService messageService;
     private final Set<String> matchingWords;
 
-    public DaiVinchikDialogAnswerServiceImpl(DaiVinchikCaseMatcher matcher,
+    public DaiVinchikDialogAnswerServiceImpl(DaiVinchikCaseMatcherService matcher,
                                              DaiVinchikMessageService messageService,
                                              Set<String> matchingWords) {
         this.matcher = matcher;
@@ -74,8 +74,10 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
             text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
         } else if (type.equals(CaseType.SOMEBODY_LIKES_YOU)) {
             //@TODO: check if the answer is correct
+            text = data.getKeyboard().getButtons().get(0).get(1).getAction().getPayload();
+        } else if (type.equals(CaseType.DISABLE_PROFILE_QUESTION)) {
             text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
-        } else if (type.equals(CaseType.TOO_MANY_LIKES)) {
+        }else if (type.equals(CaseType.TOO_MANY_LIKES)) {
             throw new TooManyLikesForToday(); //@TODO: move to the message handler  ???
         } else if (type.equals(CaseType.CAN_NOT_CONTINUE)) {
             throw new CanNotContinueException(data); //@TODO: move to the message handler ???

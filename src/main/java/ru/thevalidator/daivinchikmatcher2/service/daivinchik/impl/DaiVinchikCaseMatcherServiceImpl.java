@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.thevalidator.daivinchikmatcher2.exception.CanNotContinueException;
-import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikCaseMatcher;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikCaseMatcherService;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.CaseType;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keyboard.Keyboard;
@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Objects;
 
 @Component
-public class DaiVinchikCaseMatcherImpl implements DaiVinchikCaseMatcher {
+public class DaiVinchikCaseMatcherServiceImpl implements DaiVinchikCaseMatcherService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DaiVinchikCaseMatcherImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DaiVinchikCaseMatcherServiceImpl.class);
     private static final String PROFILE_REGEXP = "(?<name>([\\p{L}\\p{N}\\p{P}\\p{Z}\\W$^+=|`~№]+)?,) " +
             "(?<age>\\d{1,3},) " +
             "(?<city>[\\p{L}\\p{N}\\p{P}\\p{Z}$^+=|`~№]+)" +
@@ -79,6 +79,8 @@ public class DaiVinchikCaseMatcherImpl implements DaiVinchikCaseMatcher {
             type = CaseType.NO_SUCH_ANSWER;
         } else if (isQuestionAfterInactive(data)) {
             type = CaseType.QUESTION_AFTER_INACTIVE;
+        } else if (isDisableProfileQuestion(data)) {
+            type = CaseType.DISABLE_PROFILE_QUESTION;
         }
 
 
@@ -347,6 +349,21 @@ public class DaiVinchikCaseMatcherImpl implements DaiVinchikCaseMatcher {
                 && buttonRows.get(1).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
                 && buttonRows.get(1).get(0).getColor().equals(KeyboardButtonColor.POSITIVE.getValue())
                 && buttonRows.get(1).get(0).getAction().getLabel().contains("Смотреть анкеты");
+    }
+
+    private boolean isDisableProfileQuestion(MessageAndKeyboard data) {
+        Message message = data.getMessage();
+        Keyboard keyboard = data.getKeyboard();
+        List<List<KeyboardButton>> buttonRows = keyboard.getButtons();
+
+        return !keyboard.getOneTime()
+                && buttonRows.size() == 1
+                && buttonRows.get(0).size() == 2
+                && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.DEFAULT.getValue())
+                && buttonRows.get(0).get(1).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && buttonRows.get(0).get(1).getColor().equals(KeyboardButtonColor.POSITIVE.getValue())
+                && message.getText().contains("отключить анкету");
     }
 
     public boolean isProfileUrl(MessageAndKeyboard data) {
