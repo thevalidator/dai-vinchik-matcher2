@@ -39,6 +39,9 @@ public class Main {
         thread.join();
         thread2.join();
 
+        System.out.println("++++++++++++++++++++++\n" +
+                           "+ FINISHED FOR TODAY +\n" +
+                           "++++++++++++++++++++++");
         LOG.info("DAI-VINCHIK-MATCHER 2 -> END");
 
 
