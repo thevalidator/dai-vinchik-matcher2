@@ -7,13 +7,13 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.thevalidator.daivinchikmatcher2.repository.UserTokenRepository;
-import ru.thevalidator.daivinchikmatcher2.service.CaseMatcher;
-import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikDialogAnswerService;
-import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMessageService;
-import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMissedMessageService;
-import ru.thevalidator.daivinchikmatcher2.service.impl.DaiVinchikDialogAnswerServiceImpl;
-import ru.thevalidator.daivinchikmatcher2.service.impl.DaiVinchikMessageServiceImpl;
-import ru.thevalidator.daivinchikmatcher2.task.request.DaiVinchikDialogHandler;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikCaseMatcher;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikDialogAnswerService;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikMessageService;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikMissedMessageService;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.impl.DaiVinchikDialogAnswerServiceImpl;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.impl.DaiVinchikMessageServiceImpl;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.request.DaiVinchikDialogHandler;
 import ru.thevalidator.daivinchikmatcher2.vk.custom.actor.CustomUserActor;
 import ru.thevalidator.daivinchikmatcher2.vk.custom.transport.HttpTransportClientWithCustomUserAgent;
 
@@ -28,14 +28,14 @@ public class DaiVinchikDialogHandlerFactory implements FactoryBean<DaiVinchikDia
     private static final AtomicInteger counter = new AtomicInteger(0);
     private final UserTokenRepository tokenRepository;
     private final DaiVinchikMissedMessageService missedMessageService;
-    private final CaseMatcher caseMatcher;
+    private final DaiVinchikCaseMatcher caseMatcher;
     private final Set<String> matchingWords;
 
 
     @Autowired
     public DaiVinchikDialogHandlerFactory(UserTokenRepository tokenRepository,
                                           DaiVinchikMissedMessageService missedMessageService,
-                                          CaseMatcher caseMatcher,
+                                          DaiVinchikCaseMatcher caseMatcher,
                                           Set<String> matchingWords) {
         this.tokenRepository = tokenRepository;
         this.missedMessageService = missedMessageService;

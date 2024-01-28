@@ -22,19 +22,19 @@
         <Logger name="ru.thevalidator.daivinchikmatcher2.task.longpoll" level="info"/>
         <Logger name="ru.thevalidator.daivinchikmatcher2.task.request" level="info"/>
         <Logger name="ru.thevalidator.daivinchikmatcher2.vk.custom.transport" level="info"/>
-        <Logger name="ru.thevalidator.daivinchikmatcher2.service.impl.DaiVinchikDialogAnswerServiceImpl" level="debug" additivity="false">
+        <Logger name="ru.thevalidator.daivinchikmatcher2.service.daivinchik.impl.DaiVinchikDialogAnswerServiceImpl" level="debug" additivity="false">
             <AppenderRef ref="Answer"/>
         </Logger>
-        <Logger name="ru.thevalidator.daivinchikmatcher2.service.impl.CaseMatcherImpl" level="debug" additivity="false">
+        <Logger name="ru.thevalidator.daivinchikmatcher2.service.daivinchik.impl.DaiVinchikCaseMatcherImpl" level="debug" additivity="false">
             <AppenderRef ref="Answer"/>
         </Logger>
-        <Logger name="ru.thevalidator.daivinchikmatcher2.task.request.DaiVinchikDialogHandler" level="debug" additivity="false">
+        <Logger name="ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.request.DaiVinchikDialogHandler" level="debug" additivity="false">
             <AppenderRef ref="Task"/>
         </Logger>
-        <Logger name="ru.thevalidator.daivinchikmatcher2.service.impl.DaiVinchikMessageServiceImpl" level="debug" additivity="false">
+        <Logger name="ru.thevalidator.daivinchikmatcher2.service.daivinchik.impl.DaiVinchikMessageServiceImpl" level="debug" additivity="false">
             <AppenderRef ref="Task"/>
         </Logger>
-        <Logger name="ru.thevalidator.daivinchikmatcher2.service.impl.DaiVinchikMissedMessageServiceImpl" level="debug" additivity="false">
+        <Logger name="ru.thevalidator.daivinchikmatcher2.service.daivinchik.impl.DaiVinchikMissedMessageServiceImpl" level="debug" additivity="false">
             <AppenderRef ref="Missed"/>
             <AppenderRef ref="Console"/>
         </Logger>

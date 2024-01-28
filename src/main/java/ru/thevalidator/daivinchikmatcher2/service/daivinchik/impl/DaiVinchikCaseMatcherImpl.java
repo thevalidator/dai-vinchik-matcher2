@@ -1,4 +1,4 @@
-package ru.thevalidator.daivinchikmatcher2.service.impl;
+package ru.thevalidator.daivinchikmatcher2.service.daivinchik.impl;
 
 import com.vk.api.sdk.objects.messages.KeyboardButtonActionLocationType;
 import com.vk.api.sdk.objects.messages.KeyboardButtonActionTextType;
@@ -8,8 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.thevalidator.daivinchikmatcher2.exception.CanNotContinueException;
-import ru.thevalidator.daivinchikmatcher2.service.CaseMatcher;
-import ru.thevalidator.daivinchikmatcher2.service.CaseType;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikCaseMatcher;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.CaseType;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keyboard.Keyboard;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keyboard.KeyboardButton;
@@ -18,14 +18,13 @@ import java.util.List;
 import java.util.Objects;
 
 @Component
-public class CaseMatcherImpl implements CaseMatcher {
+public class DaiVinchikCaseMatcherImpl implements DaiVinchikCaseMatcher {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CaseMatcherImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DaiVinchikCaseMatcherImpl.class);
     private static final String PROFILE_REGEXP = "(?<name>([\\p{L}\\p{N}\\p{P}\\p{Z}\\W$^+=|`~№]+)?,) " +
             "(?<age>\\d{1,3},) " +
             "(?<city>[\\p{L}\\p{N}\\p{P}\\p{Z}$^+=|`~№]+)" +
             "(?<text>(((<br>)|\\n)*.*)*)";
-
 
     //@TODO: move sympathy checking here or not ???
     public boolean isSympathyKeyboardPattern(com.vk.api.sdk.objects.messages.Keyboard keyboard) {

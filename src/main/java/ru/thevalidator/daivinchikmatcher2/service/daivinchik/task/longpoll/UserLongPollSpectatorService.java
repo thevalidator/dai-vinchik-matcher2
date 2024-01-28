@@ -1,4 +1,4 @@
-package ru.thevalidator.daivinchikmatcher2.task.longpoll;
+package ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.longpoll;
 
 import com.vk.api.sdk.client.ClientResponse;
 import com.vk.api.sdk.client.VkApiClient;
@@ -13,7 +13,7 @@ import ru.thevalidator.daivinchikmatcher2.config.settings.Settings;
 import ru.thevalidator.daivinchikmatcher2.util.data.SerializerUtil;
 import ru.thevalidator.daivinchikmatcher2.vk.custom.actor.CustomUserActor;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.LongPollServerResponse;
-import ru.thevalidator.daivinchikmatcher2.task.Task;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.Task;
 
 import java.io.IOException;
 

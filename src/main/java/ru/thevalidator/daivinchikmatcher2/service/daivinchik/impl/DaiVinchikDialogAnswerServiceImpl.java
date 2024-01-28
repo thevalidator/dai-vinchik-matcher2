@@ -1,34 +1,28 @@
-package ru.thevalidator.daivinchikmatcher2.service.impl;
+package ru.thevalidator.daivinchikmatcher2.service.daivinchik.impl;
 
 import com.vk.api.sdk.objects.messages.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 import ru.thevalidator.daivinchikmatcher2.exception.CanNotContinueException;
 import ru.thevalidator.daivinchikmatcher2.exception.TooManyLikesForToday;
-import ru.thevalidator.daivinchikmatcher2.service.CaseMatcher;
-import ru.thevalidator.daivinchikmatcher2.service.CaseType;
-import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikDialogAnswerService;
-import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMessageService;
-import ru.thevalidator.daivinchikmatcher2.vk.dto.DaiVinchikDialogAnswer;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikCaseMatcher;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikDialogAnswerService;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikMessageService;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.CaseType;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.DaiVinchikDialogAnswer;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
 
 import java.util.Scanner;
 import java.util.Set;
 
-@Lazy
-@Component
 public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswerService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DaiVinchikDialogAnswerServiceImpl.class);
-    private final CaseMatcher matcher;
+    private final DaiVinchikCaseMatcher matcher;
     private final DaiVinchikMessageService messageService;
     private final Set<String> matchingWords;
 
-    @Autowired
-    public DaiVinchikDialogAnswerServiceImpl(CaseMatcher matcher,
+    public DaiVinchikDialogAnswerServiceImpl(DaiVinchikCaseMatcher matcher,
                                              DaiVinchikMessageService messageService,
                                              Set<String> matchingWords) {
         this.matcher = matcher;

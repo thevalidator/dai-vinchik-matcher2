@@ -1,4 +1,4 @@
-package ru.thevalidator.daivinchikmatcher2.service;
+package ru.thevalidator.daivinchikmatcher2.service.daivinchik.model;
 
 public enum CaseType {
 

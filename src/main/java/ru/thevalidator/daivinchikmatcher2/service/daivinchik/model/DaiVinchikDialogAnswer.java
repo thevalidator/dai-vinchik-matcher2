@@ -1,6 +1,6 @@
-package ru.thevalidator.daivinchikmatcher2.vk.dto;
+package ru.thevalidator.daivinchikmatcher2.service.daivinchik.model;
 
-import ru.thevalidator.daivinchikmatcher2.service.CaseType;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.CaseType;
 
 public class DaiVinchikDialogAnswer {
 

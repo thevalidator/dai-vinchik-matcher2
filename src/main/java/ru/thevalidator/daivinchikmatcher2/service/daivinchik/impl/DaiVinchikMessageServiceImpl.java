@@ -1,4 +1,4 @@
-package ru.thevalidator.daivinchikmatcher2.service.impl;
+package ru.thevalidator.daivinchikmatcher2.service.daivinchik.impl;
 
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.UserActor;
@@ -9,15 +9,11 @@ import com.vk.api.sdk.objects.messages.responses.GetByConversationMessageIdRespo
 import com.vk.api.sdk.objects.messages.responses.GetByIdResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import ru.thevalidator.daivinchikmatcher2.config.settings.Settings;
 import ru.thevalidator.daivinchikmatcher2.exception.CanNotContinueException;
-import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMessageService;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikMessageService;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.DaiVinchikDialogAnswer;
 import ru.thevalidator.daivinchikmatcher2.util.data.SerializerUtil;
-import ru.thevalidator.daivinchikmatcher2.vk.dto.DaiVinchikDialogAnswer;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.GetConversationsByIdResponse;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.Response;
@@ -28,15 +24,12 @@ import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keybo
 import java.util.List;
 import java.util.Objects;
 
-@Component
-@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DaiVinchikMessageServiceImpl.class);
     private final VkApiClient vk;
     private final UserActor actor;
 
-    @Autowired
     public DaiVinchikMessageServiceImpl(VkApiClient vk, UserActor actor) {
         this.vk = vk;
         this.actor = actor;

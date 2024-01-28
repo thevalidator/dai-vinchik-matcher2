@@ -1,11 +1,11 @@
-package ru.thevalidator.daivinchikmatcher2.service.impl;
+package ru.thevalidator.daivinchikmatcher2.service.daivinchik.impl;
 
 import com.vk.api.sdk.objects.messages.Keyboard;
 import com.vk.api.sdk.objects.messages.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMissedMessageService;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikMissedMessageService;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,4 +39,5 @@ public class DaiVinchikMissedMessageServiceImpl implements DaiVinchikMissedMessa
     private void saveProfileUrl(String url) {
         LOG.debug("profile: {}", url);
     }
+
 }

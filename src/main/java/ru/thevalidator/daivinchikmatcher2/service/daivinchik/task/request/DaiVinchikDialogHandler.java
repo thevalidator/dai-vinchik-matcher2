@@ -1,4 +1,4 @@
-package ru.thevalidator.daivinchikmatcher2.task.request;
+package ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.request;
 
 import com.vk.api.sdk.objects.messages.Message;
 import org.slf4j.Logger;
@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 import ru.thevalidator.daivinchikmatcher2.config.settings.Settings;
 import ru.thevalidator.daivinchikmatcher2.exception.CanNotContinueException;
 import ru.thevalidator.daivinchikmatcher2.exception.TooManyLikesForToday;
-import ru.thevalidator.daivinchikmatcher2.service.CaseType;
-import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikDialogAnswerService;
-import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMessageService;
-import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMissedMessageService;
-import ru.thevalidator.daivinchikmatcher2.task.Task;
-import ru.thevalidator.daivinchikmatcher2.vk.dto.DaiVinchikDialogAnswer;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.CaseType;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikDialogAnswerService;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikMessageService;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikMissedMessageService;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.Task;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.DaiVinchikDialogAnswer;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.SendMessageResultResponse;
 
