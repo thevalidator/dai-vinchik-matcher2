@@ -50,60 +50,41 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
     private String getAnswerTextByCase(CaseType type, MessageAndKeyboard data) {
         String text;
         if (type.equals(CaseType.PROFILE)) {
-//            LOG.debug("{}", CaseType.PROFILE);
             text = getAnswerForProfile(data);
         } else if (type.equals(CaseType.ONE_BUTTON_ANSWER)) {
-//            LOG.debug("{}", CaseType.ONE_BUTTON_ANSWER);
             text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
         } else if (type.equals(CaseType.LOCATION)) {
-//            LOG.debug("{}", CaseType.LOCATION);
             text = data.getKeyboard().getButtons().get(1).get(0).getAction().getPayload();
         } else if (type.equals(CaseType.QUESTION_AFTER_PROFILE)) {
-//            LOG.debug("{}", CaseType.QUESTION_AFTER_PROFILE); //@TODO: check profile for matching
             text = getAnswerForThePreviousMessage(data);
-            //String text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
         } else if (type.equals(CaseType.NO_SUCH_ANSWER)) {
-//            LOG.debug("{}", CaseType.NO_SUCH_ANSWER);
             var b = data.getKeyboard().getButtons();
             text = b.size() == 1 ? b.get(0).get(0).getAction().getPayload()
                     : b.get(1).get(0).getAction().getLabel();
         } else if (type.equals(CaseType.LONG_TIME_AWAY)) {
-//            LOG.debug("{}", CaseType.LONG_TIME_AWAY);
             text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
         } else if (type.equals(CaseType.SHOW_QUESTION)) {
-//            LOG.debug("{}", CaseType.SHOW_QUESTION);
             text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
         } else if (type.equals(CaseType.WANT_TO_MEET)) {
-//            LOG.debug("{}", CaseType.WANT_TO_MEET);
             text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
         } else if (type.equals(CaseType.ADS_DV)) {
-//            LOG.debug("{}", CaseType.ADS_DV);
             text = data.getKeyboard().getButtons().get(0).get(1).getAction().getPayload();
         } else if (type.equals(CaseType.ADVICE)) {
-//            LOG.debug("{}", CaseType.ADVICE);
             text = data.getKeyboard().getButtons().get(0).get(1).getAction().getPayload();
         } else if (type.equals(CaseType.QUESTION)) {
-//            LOG.debug("{}", CaseType.QUESTION);
             text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
         } else if (type.equals(CaseType.SLEEPING)) {
-//            LOG.debug("{}", CaseType.SLEEPING);
             text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
         } else if (type.equals(CaseType.PROFILE_LIKED_ME)) {
-//            LOG.debug("{}", CaseType.PROFILE_LIKED_ME);
             //@TODO: check if the answer is correct
             text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
         } else if (type.equals(CaseType.SOMEBODY_LIKES_YOU)) {
-//            LOG.debug("{}", CaseType.SOMEBODY_LIKES_YOU);
             //@TODO: check if the answer is correct
             text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
         } else if (type.equals(CaseType.TOO_MANY_LIKES)) {
-            //@TODO: check record in logs without this log
-            LOG.debug("TOO MANY LIKES: {}", data);
-            throw new TooManyLikesForToday();
+            throw new TooManyLikesForToday(); //@TODO: move to the message handler  ???
         } else if (type.equals(CaseType.CAN_NOT_CONTINUE)) {
-            //@TODO: check record in logs without this log
-            LOG.debug("CAN NOT CONTINUE: {}", data);
-            throw new CanNotContinueException(data);
+            throw new CanNotContinueException(data); //@TODO: move to the message handler ???
         } else {
             System.out.println("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" +
                     "\nMESSAGE: " + data.getMessage().getText());
