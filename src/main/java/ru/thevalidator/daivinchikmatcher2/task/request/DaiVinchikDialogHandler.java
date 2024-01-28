@@ -85,7 +85,14 @@ public class DaiVinchikDialogHandler implements Task {
                         answer.getType(), answer.getText());
                 TimeUnit.SECONDS.sleep(12);
             } catch (TooManyLikesForToday e) {
-                isActive = false;
+                if (counter == 1) {
+                    SendMessageResultResponse resultRs = messageService
+                            .sendMessage(new DaiVinchikDialogAnswer("1", CaseType.TOO_MANY_LIKES));
+                    //@TODO: check for response errors
+                    lastConversationMessageId = resultRs.getConversationMessageId();
+                } else {
+                    isActive = false;
+                }
             } catch (CanNotContinueException e) {
                 LOG.error("Error on message data: {}", e.getData());
                 isActive = false;
@@ -95,7 +102,10 @@ public class DaiVinchikDialogHandler implements Task {
                 throw new RuntimeException(e);
             }
         }
-        LOG.debug("Finish task");
+        LOG.debug("Finish task [{}] (L_{}/D_{})", counter, stats.getLikes(), stats.getDislikes());
+        System.out.printf("[%s] [%03d] (L_%03d/D_%03d) >>>>> FINISHED <<<<<\n",
+                Thread.currentThread().getName(), counter,
+                stats.getLikes(), stats.getDislikes());
     }
 
     private void handleMissedMessages(int from, int to) {
