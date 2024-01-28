@@ -1,21 +1,17 @@
-package ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.request;
+package ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.poll;
 
 import com.vk.api.sdk.objects.messages.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import ru.thevalidator.daivinchikmatcher2.config.settings.Settings;
 import ru.thevalidator.daivinchikmatcher2.exception.CanNotContinueException;
 import ru.thevalidator.daivinchikmatcher2.exception.TooManyLikesForToday;
-import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.CaseType;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikDialogAnswerService;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikMessageService;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikMissedMessageService;
-import ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.Task;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.CaseType;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.DaiVinchikDialogAnswer;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.Task;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.SendMessageResultResponse;
 
@@ -23,8 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@Component
-@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DaiVinchikDialogHandler implements Task {
 
     private static final Logger LOG = LoggerFactory.getLogger(DaiVinchikDialogHandler.class);
@@ -35,7 +29,6 @@ public class DaiVinchikDialogHandler implements Task {
     private volatile boolean isActive;
     private int counter = 0;
 
-    @Autowired
     public DaiVinchikDialogHandler(DaiVinchikMessageService messageService,
                                    DaiVinchikDialogAnswerService answerService,
                                    DaiVinchikMissedMessageService missedMessageService) {

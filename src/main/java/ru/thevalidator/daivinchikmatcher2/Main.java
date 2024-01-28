@@ -5,9 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import ru.thevalidator.daivinchikmatcher2.config.DaiVinchikDialogHandlerFactory;
 import ru.thevalidator.daivinchikmatcher2.config.SpringJavaConfig;
-import ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.TaskRunner;
-import ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.impl.TaskRunnerImpl;
-import ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.request.DaiVinchikDialogHandler;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.poll.DaiVinchikDialogHandler;
 
 import java.util.concurrent.TimeUnit;
 
