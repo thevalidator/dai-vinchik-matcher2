@@ -9,7 +9,7 @@
 - [x] ~~add spring context~~
 - [x] ~~fix answer duplication~~
 - [ ] set userID in custom actor after connect
-- [ ] check if DV not answered ()
+- [ ] +- check if DV not answered ()
 - [x] ~~get missed messages~~
 - [x] ~~collect profile links~~
 - [ ] save account data to db with profiles url
@@ -20,7 +20,7 @@
 - [ ] handle question-after-inactive
 - [ ] message service impl line 142: check what if no new messages
 - [ ] fix answer for 2 buttons profile correct prompt
-- [ ] feature 3
+- [x] fix stopping when on  start the last message is too many like
 - [ ] feature 3
 - [ ] feature 3
 - [ ] feature 3
