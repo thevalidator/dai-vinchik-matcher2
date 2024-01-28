@@ -8,7 +8,7 @@
             <PatternLayout pattern="%d %-5p %c{1.} [%3L] [%t] %m%n" charset="UTF-8"/>
         </File>
         <File name="Task" fileName="logs/task_debug.log">
-            <PatternLayout pattern="%d %-5p %38c{1.} [%3L] [%t] %m%n" charset="UTF-8"/>
+            <PatternLayout pattern="%d %-5p %40c{1.} [%3L] [%t] %m%n" charset="UTF-8"/>
         </File>
         <File name="Missed" fileName="logs/missed_debug.log">
             <PatternLayout pattern="%d %-5p %c{1.} [%t] %m%n" charset="UTF-8"/>
