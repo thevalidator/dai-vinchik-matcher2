@@ -38,10 +38,14 @@
             <AppenderRef ref="Missed"/>
             <AppenderRef ref="Console"/>
         </Logger>
+        <Logger name="ru.thevalidator.daivinchikmatcher2.repository.impl" level="debug" additivity="false">
+            <AppenderRef ref="Task"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <Logger name="ru.thevalidator.daivinchikmatcher2.config.SpringJavaConfig" level="debug" additivity="false">
+            <AppenderRef ref="Task"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
 
-<!--        <Logger name="ru.thevalidator.daivinchikmatcher2.task.longpoll" level="debug"/>-->
-<!--        <Logger name="ru.thevalidator.daivinchikmatcher2.task.request" level="debug"/>-->
-<!--        <Logger name="ru.thevalidator.daivinchikmatcher2.vk.custom.transport" level="debug"/>-->
-<!--        <Logger name="ru.thevalidator.daivinchikmatcher2.service" level="debug"/>-->
     </Loggers>
 </Configuration>

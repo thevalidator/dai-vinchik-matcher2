@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 public class DaiVinchikDialogHandlerFactory implements FactoryBean<DaiVinchikDialogHandler> {
 
-    private static final int MAX_HANDLERS = 3;
+    private static final int MAX_HANDLERS = 4;
     private static final AtomicInteger counter = new AtomicInteger(0);
     private final UserTokenRepository tokenRepository;
     private final DaiVinchikMissedMessageService missedMessageService;
@@ -43,6 +43,10 @@ public class DaiVinchikDialogHandlerFactory implements FactoryBean<DaiVinchikDia
         this.matchingWords = matchingWords;
     }
 
+    public boolean hasObject() {
+        return !tokenRepository.getTokens().isEmpty() && counter.get() < MAX_HANDLERS;
+    }
+
     @Override
     public DaiVinchikDialogHandler getObject() {
         if (counter.incrementAndGet() > MAX_HANDLERS) {
@@ -54,7 +58,6 @@ public class DaiVinchikDialogHandlerFactory implements FactoryBean<DaiVinchikDia
         DaiVinchikDialogAnswerService answerService = new DaiVinchikDialogAnswerServiceImpl(
                 caseMatcher, messageService, matchingWords);
 
-        System.out.println(">>> CREATED: " + token);
         return new DaiVinchikDialogHandler(messageService, answerService, missedMessageService);
     }
 

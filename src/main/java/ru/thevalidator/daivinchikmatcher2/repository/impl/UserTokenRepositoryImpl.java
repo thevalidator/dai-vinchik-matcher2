@@ -1,5 +1,7 @@
 package ru.thevalidator.daivinchikmatcher2.repository.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.thevalidator.daivinchikmatcher2.repository.UserTokenRepository;
 
@@ -15,6 +17,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @Component
 public class UserTokenRepositoryImpl implements UserTokenRepository {
 
+    public static final Logger LOG = LoggerFactory.getLogger(UserTokenRepositoryImpl.class);
     private static ConcurrentLinkedQueue<String> tokenQueue;
 
     public UserTokenRepositoryImpl() {
@@ -27,6 +30,7 @@ public class UserTokenRepositoryImpl implements UserTokenRepository {
         for (String token: tokens) {
             tokenQueue.offer(token);
         }
+        LOG.debug("Loaded {} tokens", tokens.size());
     }
 
     private List<String> readTokens() {

@@ -7,7 +7,8 @@ import ru.thevalidator.daivinchikmatcher2.config.DaiVinchikDialogHandlerFactory;
 import ru.thevalidator.daivinchikmatcher2.config.SpringJavaConfig;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.poll.DaiVinchikDialogHandler;
 
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
 
@@ -19,16 +20,22 @@ public class Main {
         var context = new AnnotationConfigApplicationContext(SpringJavaConfig.class);
         DaiVinchikDialogHandlerFactory factory = context.getBean(DaiVinchikDialogHandlerFactory.class);
 
-        DaiVinchikDialogHandler service = factory.getObject();
-        DaiVinchikDialogHandler service2 = factory.getObject();
+        List<Thread> threads = new ArrayList<>();
+        int counter = 0;
+        while (factory.hasObject()) {
+            DaiVinchikDialogHandler service = factory.getObject();
+            Thread thread = new Thread(service, "account - " + ++counter);
+            threads.add(thread);
+        }
 
-        Thread thread = new Thread(service);
-        Thread thread2 = new Thread(service2);
-        thread.start();
-        TimeUnit.SECONDS.sleep(6);
-        thread2.start();
-        thread.join();
-        thread2.join();
+        for (Thread thread: threads) {
+            thread.start();
+        }
+
+        for (Thread thread: threads) {
+            thread.join();
+        }
+
 
 //        TaskRunner runner = new TaskRunnerImpl();
 //        runner.runTask(service);
@@ -38,13 +45,14 @@ public class Main {
 //            TimeUnit.SECONDS.sleep(5);
 //        }
 
-        System.out.println("""
-                ++++++++++++++++++++++
-                + FINISHED FOR TODAY +
-                ++++++++++++++++++++++
-                """);
 
         LOG.info("DAI-VINCHIK-MATCHER 2 -> END");
+        System.out.print("""
+                +++++++++++++++++++++++++
+                + FINISHED SUCCESSFULLY +
+                +++++++++++++++++++++++++
+                """);
+
     }
 
 }

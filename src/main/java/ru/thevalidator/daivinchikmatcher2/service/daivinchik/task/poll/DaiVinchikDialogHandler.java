@@ -85,6 +85,9 @@ public class DaiVinchikDialogHandler implements Task {
                     lastConversationMessageId = resultRs.getConversationMessageId();
                 } else {
                     isActive = false;
+                    System.out.printf("[%s] [%03d] (L_%03d/D_%03d) TOO MANY LIKES FOR TODAY\n",
+                            Thread.currentThread().getName(), counter,
+                            stats.getLikes(), stats.getDislikes());
                 }
             } catch (CanNotContinueException e) {
                 LOG.error("Error on message data: {}", e.getData());

@@ -1,0 +1,4 @@
+0.1.3
+    - increase max threads to 4
+    - add more logging points
+    - add app version bean
