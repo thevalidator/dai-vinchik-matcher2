@@ -6,6 +6,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import ru.thevalidator.daivinchikmatcher2.config.DaiVinchikDialogHandlerFactory;
 import ru.thevalidator.daivinchikmatcher2.config.SpringJavaConfig;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.poll.DaiVinchikDialogHandler;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.poll.Statistic;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +48,12 @@ public class Main {
 
 
         LOG.info("DAI-VINCHIK-MATCHER 2 -> END");
+        var stats = Statistic.getGlobalStatistic();
+        System.out.println(">>>>>>>   STATS   <<<<<<<");
+        for (Statistic s: stats) {
+            System.out.printf("[%s] (L_%03d/D_%03d) \n",
+                    s.getName(), s.getLikes(), s.getDislikes());
+        }
         System.out.print("""
                 +++++++++++++++++++++++++
                 + FINISHED SUCCESSFULLY +

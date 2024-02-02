@@ -40,6 +40,7 @@ public class DaiVinchikDialogHandler implements Task {
 
     @Override
     public void run() {
+        stats.setName(Thread.currentThread().getName());
         isActive = true;
         LOG.debug("Start task");
         MessageAndKeyboard data;
@@ -99,9 +100,7 @@ public class DaiVinchikDialogHandler implements Task {
             }
         }
         LOG.debug("Finish task [{}] (L_{}/D_{})", counter, stats.getLikes(), stats.getDislikes());
-        System.out.printf("[%s] [%03d] (L_%03d/D_%03d) >>>>> FINISHED <<<<<\n",
-                Thread.currentThread().getName(), counter,
-                stats.getLikes(), stats.getDislikes());
+        Statistic.addStatisticToGlobal(stats);
     }
 
     private void handleMissedMessages(int from, int to) {
