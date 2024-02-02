@@ -11,8 +11,11 @@ import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikMessageSe
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.CaseType;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.DaiVinchikDialogAnswer;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
+import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keyboard.KeyboardButton;
 
-import java.util.Scanner;
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
 import java.util.Set;
 
 public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswerService {
@@ -77,22 +80,55 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
             text = data.getKeyboard().getButtons().get(0).get(1).getAction().getPayload();
         } else if (type.equals(CaseType.DISABLE_PROFILE_QUESTION)) {
             text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
-        }else if (type.equals(CaseType.TOO_MANY_LIKES)) {
+        } else if (type.equals(CaseType.TOO_MANY_LIKES)) {
             throw new TooManyLikesForToday(); //@TODO: move to the message handler  ???
         } else if (type.equals(CaseType.CAN_NOT_CONTINUE)) {
             throw new CanNotContinueException(data); //@TODO: move to the message handler ???
         } else {
-            System.out.println("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" +
-                    "\nMESSAGE: " + data.getMessage().getText());
-            System.out.println("\nKEYBOARD: " + data.getKeyboard().getButtons());
-            Scanner sc = new Scanner(System.in);
-            System.out.print("\n>>>>\tENTER CORRECT ANSWER:");
-            text = sc.nextLine();
-            System.out.println();
+            text = getAnswerFromUser(Thread.currentThread().getName(), data);
         }
         return text;
         //@TODO: answer-duplication case
         //@TODO: add question after inactive
+    }
+
+    private String getAnswerFromUser(String threadName, MessageAndKeyboard data) {
+        String userInputText = null;
+        int result = JOptionPane.CANCEL_OPTION;
+
+        StringBuilder sb = new StringBuilder(data.getMessage().getText() + "\n");
+        for (List<KeyboardButton> buttonRow: data.getKeyboard().getButtons()) {
+            for (KeyboardButton button: buttonRow) {
+                sb.append("\nLabel: ").append(button.getAction().getLabel());
+                if (button.getAction().getPayload() != null) {
+                    sb.append(" Payload: ").append(button.getAction().getPayload());
+                }
+            }
+        }
+        String messageInfo = sb.toString();
+        while (result != JOptionPane.OK_OPTION || userInputText.isBlank()) {
+            JTextArea jTextArea = new JTextArea(messageInfo);
+            JTextField answerField = new JTextField();
+
+            JPanel panel = new JPanel(new GridLayout(0, 1));
+            panel.add(new JLabel("MESSAGE:"));
+            panel.add(jTextArea);
+            panel.add(new JLabel("GIVE ANSWER (payload):"));
+            panel.add(answerField);
+
+            result = JOptionPane.showConfirmDialog(
+                    null,
+                    panel,
+                    threadName,
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE);
+
+            if (result == JOptionPane.OK_OPTION) {
+                userInputText = answerField.getText().trim();
+            }
+        }
+
+        return userInputText;
     }
 
     private String getAnswerForProfile(MessageAndKeyboard data) {
