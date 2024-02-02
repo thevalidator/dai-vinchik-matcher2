@@ -124,27 +124,7 @@ public class DaiVinchikDialogHandler implements Task {
         throw new UnsupportedOperationException("Not supported yet");
     }
 
-}
 
-class Statistic {
-
-    private int likes;
-    private int dislikes;
-
-    public int getLikes() {
-        return likes;
-    }
-
-    public void increaseLikes() {
-        likes++;
-    }
-
-    public int getDislikes() {
-        return dislikes;
-    }
-
-    public void increaseDislikes() {
-        dislikes++;
-    }
 
 }
+
