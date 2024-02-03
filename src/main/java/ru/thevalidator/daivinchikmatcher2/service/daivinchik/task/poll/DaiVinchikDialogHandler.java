@@ -70,7 +70,7 @@ public class DaiVinchikDialogHandler implements Task {
                 }
                 DaiVinchikDialogAnswer answer = answerService.findAnswer(data);
                 LOG.debug("Dialog answer found: {}", answer);
-                if (answer == null || counter == 5) {
+                if (answer == null) {
                     isActive = false;
                     break;
                 }

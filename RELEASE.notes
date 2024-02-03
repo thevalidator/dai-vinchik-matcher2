@@ -1,3 +1,6 @@
+0.1.5
+    - add additional data to statistic (start-finish times, duration, match count)
+    - add random delay (1 - 10 sec) for base delay time (8 sec)
 0.1.4
     - add gui form for user answer input
     - show statistic after finish
