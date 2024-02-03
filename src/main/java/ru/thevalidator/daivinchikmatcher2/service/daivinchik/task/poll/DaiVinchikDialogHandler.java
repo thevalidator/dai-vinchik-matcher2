@@ -12,22 +12,29 @@ import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikMissedMes
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.CaseType;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.DaiVinchikDialogAnswer;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.Task;
+import ru.thevalidator.daivinchikmatcher2.statisctic.Statistic;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.SendMessageResultResponse;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 public class DaiVinchikDialogHandler implements Task {
 
     private static final Logger LOG = LoggerFactory.getLogger(DaiVinchikDialogHandler.class);
+    public static final int BASE_DELAY = 8;
+    //public static final Random random = new Random();
     private final DaiVinchikMessageService messageService;
     private final DaiVinchikDialogAnswerService answerService;
     private final DaiVinchikMissedMessageService missedMessageService;
     private final Statistic stats;
     private volatile boolean isActive;
     private int counter = 0;
+    private final Random random;
 
     public DaiVinchikDialogHandler(DaiVinchikMessageService messageService,
                                    DaiVinchikDialogAnswerService answerService,
@@ -35,12 +42,16 @@ public class DaiVinchikDialogHandler implements Task {
         this.messageService = messageService;
         this.answerService = answerService;
         this.missedMessageService = missedMessageService;
-        stats = new Statistic();
+        this.stats = new Statistic();
+        //this.random = ThreadLocalRandom.current();
+        this.random = new Random();
     }
 
     @Override
     public void run() {
+        random.setSeed(System.currentTimeMillis());
         stats.setName(Thread.currentThread().getName());
+        stats.setStartTime(Instant.now());
         isActive = true;
         LOG.debug("Start task");
         MessageAndKeyboard data;
@@ -59,7 +70,7 @@ public class DaiVinchikDialogHandler implements Task {
                 }
                 DaiVinchikDialogAnswer answer = answerService.findAnswer(data);
                 LOG.debug("Dialog answer found: {}", answer);
-                if (answer == null) {
+                if (answer == null || counter == 5) {
                     isActive = false;
                     break;
                 }
@@ -73,11 +84,12 @@ public class DaiVinchikDialogHandler implements Task {
                         stats.increaseDislikes();
                     }
                 }
-                System.out.printf("[%s] [%03d] (L_%03d/D_%03d) CASE: %s | ANSWER: %s | SLEEPING 12 SECONDS\n",
+                int sleepingTime = generateSleepingTime();
+                System.out.printf("[%s] [%03d] (L_%03d/D_%03d) CASE: %s | ANSWER: %s | SLEEPING %d SECONDS\n",
                         Thread.currentThread().getName(), counter,
-                        stats.getLikes(), stats.getDislikes(),
-                        answer.getType(), answer.getText());
-                TimeUnit.SECONDS.sleep(12);
+                        stats.getLikesSent(), stats.getDislikesSent(),
+                        answer.getType(), answer.getText(), sleepingTime);
+                TimeUnit.SECONDS.sleep(sleepingTime);
             } catch (TooManyLikesForToday e) {
                 if (counter == 1) {
                     SendMessageResultResponse resultRs = messageService
@@ -88,7 +100,7 @@ public class DaiVinchikDialogHandler implements Task {
                     isActive = false;
                     System.out.printf("[%s] [%03d] (L_%03d/D_%03d) TOO MANY LIKES FOR TODAY\n",
                             Thread.currentThread().getName(), counter,
-                            stats.getLikes(), stats.getDislikes());
+                            stats.getLikesSent(), stats.getDislikesSent());
                 }
             } catch (CanNotContinueException e) {
                 LOG.error("Error on message data: {}", e.getData());
@@ -99,8 +111,13 @@ public class DaiVinchikDialogHandler implements Task {
                 throw new RuntimeException(e);
             }
         }
-        LOG.debug("Finish task [{}] (L_{}/D_{})", counter, stats.getLikes(), stats.getDislikes());
+        LOG.debug("Finish task [{}] (L_{}/D_{})", counter, stats.getLikesSent(), stats.getDislikesSent());
+        stats.setFinishTime(Instant.now());
         Statistic.addStatisticToGlobal(stats);
+    }
+
+    private int generateSleepingTime() {
+        return random.nextInt(10) + 1 + BASE_DELAY;
     }
 
     private void handleMissedMessages(int from, int to) {
@@ -112,7 +129,10 @@ public class DaiVinchikDialogHandler implements Task {
         for (Message m: rs) {
             if (m.getFromId().equals(Settings.INSTANCE.getDaiVinchickPeerId())) {
                 LOG.info("MISSED: {}", m);
-                missedMessageService.findSympathy(m);
+                String url = missedMessageService.findProfileUrl(m);
+                if (url != null) {
+                    stats.increaseMatchesCount();
+                }
             }
         }
     }

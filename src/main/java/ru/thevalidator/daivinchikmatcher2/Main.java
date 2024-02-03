@@ -6,10 +6,11 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import ru.thevalidator.daivinchikmatcher2.config.DaiVinchikDialogHandlerFactory;
 import ru.thevalidator.daivinchikmatcher2.config.SpringJavaConfig;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.poll.DaiVinchikDialogHandler;
-import ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.poll.Statistic;
+import ru.thevalidator.daivinchikmatcher2.statisctic.Statistic;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
 
@@ -31,6 +32,7 @@ public class Main {
 
         for (Thread thread: threads) {
             thread.start();
+            TimeUnit.SECONDS.sleep(5);
         }
 
         for (Thread thread: threads) {
@@ -47,18 +49,25 @@ public class Main {
 //        }
 
 
-        LOG.info("DAI-VINCHIK-MATCHER 2 -> END");
         var stats = Statistic.getGlobalStatistic();
-        System.out.println(">>>>>>>   STATS   <<<<<<<");
+        System.out.println();
+        System.out.println("|---------------------------------------------------------------------|");
+        System.out.println("|                              STATISTIC                              |");
+        System.out.println("|---------------------------------------------------------------------|");
+
         for (Statistic s: stats) {
-            System.out.printf("[%s] (L_%03d/D_%03d) \n",
-                    s.getName(), s.getLikes(), s.getDislikes());
+            System.out.println("| " + s + " |");
+            System.out.println("|---------------------------------------------------------------------|");
+            LOG.info(s.toString());
         }
+
+        System.out.println();
         System.out.print("""
                 +++++++++++++++++++++++++
                 + FINISHED SUCCESSFULLY +
                 +++++++++++++++++++++++++
                 """);
+        LOG.info("DAI-VINCHIK-MATCHER 2 -> END");
 
     }
 

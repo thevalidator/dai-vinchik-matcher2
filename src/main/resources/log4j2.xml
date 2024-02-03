@@ -13,6 +13,9 @@
         <File name="Missed" fileName="logs/missed_debug.log">
             <PatternLayout pattern="%d %-5p %c{1.} [%t] %m%n" charset="UTF-8"/>
         </File>
+        <File name="Statistic" fileName="logs/statistic.log">
+            <PatternLayout pattern="%-5p %m%n" charset="UTF-8"/>
+        </File>
     </Appenders>
 
     <Loggers>
@@ -45,6 +48,9 @@
         <Logger name="ru.thevalidator.daivinchikmatcher2.config.SpringJavaConfig" level="debug" additivity="false">
             <AppenderRef ref="Task"/>
             <AppenderRef ref="Console"/>
+        </Logger>
+        <Logger name="ru.thevalidator.daivinchikmatcher2.Main" level="info" additivity="false">
+            <AppenderRef ref="Statistic"/>
         </Logger>
 
     </Loggers>

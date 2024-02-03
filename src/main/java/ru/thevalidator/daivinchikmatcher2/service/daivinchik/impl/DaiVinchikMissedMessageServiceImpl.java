@@ -17,16 +17,19 @@ public class DaiVinchikMissedMessageServiceImpl implements DaiVinchikMissedMessa
     private static final Pattern pattern = Pattern.compile("\\W+друзья - (?<url>vk.com/id\\d+)");
 
     @Override
-    public void findSympathy(Message message) {
+    public String findProfileUrl(Message message) {
+        String url = null;
         if (isSympathyKeyboardPattern(message.getKeyboard())) {
             Matcher matcher = pattern.matcher(message.getText());
             if (matcher.find()) {
-                saveProfileUrl(matcher.group("url"));
+                url = matcher.group("url");
+                saveProfileUrl(url);
             }
         } else {
             //@TODO: remove in future if sympathy detection works fine
             LOG.debug("Unknown missed message type: {}", message);
         }
+        return url;
     }
 
     private boolean isSympathyKeyboardPattern(Keyboard keyboard) {
