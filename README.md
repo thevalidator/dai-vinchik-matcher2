@@ -9,15 +9,20 @@
 - [x] ~~add spring context~~
 - [x] ~~fix answer duplication~~
 - [ ] set userID in custom actor after connect
-- [ ] check if DV not answered ()
+- [ ] +- check if DV not answered ()
 - [x] ~~get missed messages~~
 - [x] ~~collect profile links~~
 - [ ] save account data to db with profiles url
 - [ ] send messages for mutual liked profiles if they didn't text first
 - [ ] profile creator service
 - [x] ~~return missed messages without last one~~
-- [ ] feature 1
-- [ ] feature 1
-- [ ] feature 1
-- [ ] feature 2
+- [ ] handle inactive
+- [ ] handle question-after-inactive
+- [ ] message service impl line 142: check what if no new messages
+- [ ] fix answer for 2 buttons profile correct prompt
+- [x] fix stopping when on  start the last message is too many like
+- [ ] Make save and show stats if exception occurs
+- [ ] handle errors
+- [ ] feature 3
+- [ ] feature 3
 - [ ] feature 3

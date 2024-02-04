@@ -1,7 +1,7 @@
-package ru.thevalidator.daivinchikmatcher2.service;
+package ru.thevalidator.daivinchikmatcher2.service.daivinchik;
 
 import com.vk.api.sdk.objects.messages.Message;
-import ru.thevalidator.daivinchikmatcher2.vk.dto.DaiVinchikDialogAnswer;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.DaiVinchikDialogAnswer;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.SendMessageResultResponse;
 
@@ -19,6 +19,8 @@ public interface DaiVinchikMessageService {
 
     public Integer getDaiVinchikLastConversationMessageId();
 
-    public SendMessageResultResponse sendMessage(DaiVinchikDialogAnswer answer);
+    public SendMessageResultResponse sendAnswerMessage(DaiVinchikDialogAnswer answer);
+
+    public String sendPhotoWithDelay(byte[] image, String tmpFilePath) throws Exception ;
 
 }

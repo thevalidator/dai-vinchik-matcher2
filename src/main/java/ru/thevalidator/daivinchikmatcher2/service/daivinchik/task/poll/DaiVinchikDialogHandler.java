@@ -1,56 +1,58 @@
-package ru.thevalidator.daivinchikmatcher2.task.request;
+package ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.poll;
 
 import com.vk.api.sdk.objects.messages.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import ru.thevalidator.daivinchikmatcher2.config.settings.Settings;
 import ru.thevalidator.daivinchikmatcher2.exception.CanNotContinueException;
 import ru.thevalidator.daivinchikmatcher2.exception.TooManyLikesForToday;
-import ru.thevalidator.daivinchikmatcher2.service.CaseType;
-import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikDialogAnswerService;
-import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMessageService;
-import ru.thevalidator.daivinchikmatcher2.service.DaiVinchikMissedMessageService;
-import ru.thevalidator.daivinchikmatcher2.task.Task;
-import ru.thevalidator.daivinchikmatcher2.vk.dto.DaiVinchikDialogAnswer;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikDialogAnswerService;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikMessageService;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikMissedMessageService;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.CaseType;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.DaiVinchikDialogAnswer;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.Task;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.statisctic.Statistic;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.SendMessageResultResponse;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-@Component
-@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DaiVinchikDialogHandler implements Task {
 
     private static final Logger LOG = LoggerFactory.getLogger(DaiVinchikDialogHandler.class);
+    public static final int BASE_DELAY = 8;
     private final DaiVinchikMessageService messageService;
     private final DaiVinchikDialogAnswerService answerService;
     private final DaiVinchikMissedMessageService missedMessageService;
     private final Statistic stats;
     private volatile boolean isActive;
     private int counter = 0;
+    private final Random random;
 
-    @Autowired
     public DaiVinchikDialogHandler(DaiVinchikMessageService messageService,
                                    DaiVinchikDialogAnswerService answerService,
                                    DaiVinchikMissedMessageService missedMessageService) {
         this.messageService = messageService;
         this.answerService = answerService;
         this.missedMessageService = missedMessageService;
-        stats = new Statistic();
+        this.stats = new Statistic();
+        this.random = new Random();
     }
 
     @Override
     public void run() {
-        isActive = true;
+        prepareBeforeStart();
         LOG.debug("Start task");
         MessageAndKeyboard data;
         Integer lastConversationMessageId = messageService.getDaiVinchikLastConversationMessageId();
+        if (lastConversationMessageId < 1) {
+            initDaiVinchikConversation();
+        }
         int messageDelta;
         while (isActive) {
             try {
@@ -69,7 +71,7 @@ public class DaiVinchikDialogHandler implements Task {
                     isActive = false;
                     break;
                 }
-                SendMessageResultResponse resultRs = messageService.sendMessage(answer);
+                SendMessageResultResponse resultRs = messageService.sendAnswerMessage(answer);
                 //@TODO: check for response errors
                 lastConversationMessageId = resultRs.getConversationMessageId();
                 if (answer.getType().equals(CaseType.PROFILE) || answer.getType().equals(CaseType.QUESTION_AFTER_PROFILE)) {
@@ -79,11 +81,24 @@ public class DaiVinchikDialogHandler implements Task {
                         stats.increaseDislikes();
                     }
                 }
-                System.out.printf("[%03d] (L_%03d/D_%03d) CASE: %s | ANSWER: %s | SLEEPING 12 SECONDS\n",
-                        counter, stats.getLikes(), stats.getDislikes(), answer.getType(), answer.getText());
-                TimeUnit.SECONDS.sleep(12);
+                int sleepingTime = generateSleepingTime();
+                System.out.printf("[%s] [%03d] (L_%03d/D_%03d/M_%03d) CASE: %s | ANSWER: %s | SLEEPING %d SECONDS\n",
+                        stats.getName(), counter, stats.getLikesSent(),
+                        stats.getDislikesSent(), stats.getMatchesCount(),
+                        answer.getType(), answer.getText(), sleepingTime);
+                TimeUnit.SECONDS.sleep(sleepingTime);
             } catch (TooManyLikesForToday e) {
-                isActive = false;
+                if (counter == 1) {
+                    SendMessageResultResponse resultRs = messageService
+                            .sendAnswerMessage(new DaiVinchikDialogAnswer("1", "1", CaseType.TOO_MANY_LIKES));
+                    //@TODO: check for response errors
+                    lastConversationMessageId = resultRs.getConversationMessageId();
+                } else {
+                    isActive = false;
+                    System.out.printf("[%s] [%03d] (L_%03d/D_%03d/M_%03d) TOO MANY LIKES FOR TODAY\n",
+                            stats.getName(), counter, stats.getLikesSent(),
+                            stats.getDislikesSent(), stats.getMatchesCount());
+                }
             } catch (CanNotContinueException e) {
                 LOG.error("Error on message data: {}", e.getData());
                 isActive = false;
@@ -93,7 +108,29 @@ public class DaiVinchikDialogHandler implements Task {
                 throw new RuntimeException(e);
             }
         }
-        LOG.debug("Finish task");
+        LOG.debug("Finish task [{}] (L_{}/D_{}/M_{})",
+                counter,
+                stats.getLikesSent(),
+                stats.getDislikesSent(),
+                stats.getMatchesCount());
+        stats.setFinishTime(Instant.now());
+    }
+
+    private void initDaiVinchikConversation() {
+        //@TODO: check if profile creation state (to avoid one button answer collision)
+        throw new UnsupportedOperationException("Create profile feature is not supported yet");
+    }
+
+    private void prepareBeforeStart() {
+        Statistic.addStatisticToGlobal(stats);
+        stats.setName(Thread.currentThread().getName());
+        stats.setStartTime(Instant.now());
+        isActive = true;
+        random.setSeed(System.currentTimeMillis());
+    }
+
+    private int generateSleepingTime() {
+        return random.nextInt(10) + 1 + BASE_DELAY;
     }
 
     private void handleMissedMessages(int from, int to) {
@@ -104,8 +141,11 @@ public class DaiVinchikDialogHandler implements Task {
         var rs = messageService.getDaiVinchikMessagesByConversationId(ids);
         for (Message m: rs) {
             if (m.getFromId().equals(Settings.INSTANCE.getDaiVinchickPeerId())) {
-                LOG.info("MISSED: {}", m);
-                missedMessageService.findSympathy(m);
+                LOG.warn("MISSED: {}", m);
+                String url = missedMessageService.findProfileUrl(m);
+                if (url != null) {
+                    stats.increaseMatchesCount();
+                }
             }
         }
     }
@@ -118,25 +158,3 @@ public class DaiVinchikDialogHandler implements Task {
 
 }
 
-class Statistic {
-
-    private int likes;
-    private int dislikes;
-
-    public int getLikes() {
-        return likes;
-    }
-
-    public void increaseLikes() {
-        likes++;
-    }
-
-    public int getDislikes() {
-        return dislikes;
-    }
-
-    public void increaseDislikes() {
-        dislikes++;
-    }
-
-}

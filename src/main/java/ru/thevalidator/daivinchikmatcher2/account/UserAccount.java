@@ -7,6 +7,7 @@ public class UserAccount {
     public UserAccount(String name, String token) {
         this.name = name;
         this.token = token;
+        //TODO: move to repository or model
     }
 
     public String getName() {

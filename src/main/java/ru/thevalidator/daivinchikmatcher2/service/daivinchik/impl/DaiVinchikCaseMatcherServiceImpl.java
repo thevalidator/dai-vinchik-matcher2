@@ -1,4 +1,4 @@
-package ru.thevalidator.daivinchikmatcher2.service.impl;
+package ru.thevalidator.daivinchikmatcher2.service.daivinchik.impl;
 
 import com.vk.api.sdk.objects.messages.KeyboardButtonActionLocationType;
 import com.vk.api.sdk.objects.messages.KeyboardButtonActionTextType;
@@ -7,9 +7,8 @@ import com.vk.api.sdk.objects.messages.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import ru.thevalidator.daivinchikmatcher2.exception.CanNotContinueException;
-import ru.thevalidator.daivinchikmatcher2.service.CaseMatcher;
-import ru.thevalidator.daivinchikmatcher2.service.CaseType;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikCaseMatcherService;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.CaseType;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keyboard.Keyboard;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keyboard.KeyboardButton;
@@ -18,16 +17,15 @@ import java.util.List;
 import java.util.Objects;
 
 @Component
-public class CaseMatcherImpl implements CaseMatcher {
+public class DaiVinchikCaseMatcherServiceImpl implements DaiVinchikCaseMatcherService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CaseMatcherImpl.class);
-    private static final String PROFILE_REGEXP = //"([\\p{L}\\p{N}\\p{P}\\p{Z}\\W$^+=|`~№]+(<br>|\\n)+)?" +
-            "(?<name>([\\p{L}\\p{N}\\p{P}\\p{Z}\\W$^+=|`~№]+)?,) " +
-                    "(?<age>\\d{1,3},) " +
-                    "(?<city>[\\p{L}\\p{N}\\p{P}\\p{Z}$^+=|`~№]+)" +
-                    "(?<text>(((<br>)|\\n)*.*)*)";
+    private static final Logger LOG = LoggerFactory.getLogger(DaiVinchikCaseMatcherServiceImpl.class);
+    private static final String PROFILE_REGEXP = "(?<name>([\\p{L}\\p{N}\\p{P}\\p{Z}\\W$^+=|`~№]+)?,) " +
+            "(?<age>\\d{1,3},) " +
+            "(?<city>[\\p{L}\\p{N}\\p{P}\\p{Z}$^+=|`~№]+)" +
+            "(?<text>(((<br>)|\\n)*.*)*)";
 
-
+    //@TODO: move sympathy checking here or not ???
     public boolean isSympathyKeyboardPattern(com.vk.api.sdk.objects.messages.Keyboard keyboard) {
         return keyboard != null
                 && keyboard.getInline()
@@ -37,11 +35,12 @@ public class CaseMatcherImpl implements CaseMatcher {
 
     @Override
     public CaseType detectCase(MessageAndKeyboard data) {
-        CaseType type;
+        CaseType type = CaseType.UNKNOWN;
 
         LOG.trace("MESSAGE: {}", data);
         if (Objects.isNull(data.getKeyboard())) {
-            throw new CanNotContinueException(data);
+            //throw new CanNotContinueException(data);
+            return CaseType.UNKNOWN;
         }
 
         if (isProfile(data)) {
@@ -78,6 +77,10 @@ public class CaseMatcherImpl implements CaseMatcher {
             type = CaseType.LONG_TIME_AWAY;
         } else if (isNoSuchAnswer(data)) {
             type = CaseType.NO_SUCH_ANSWER;
+        } else if (isQuestionAfterInactive(data)) {
+            type = CaseType.QUESTION_AFTER_INACTIVE;
+        } else if (isDisableProfileQuestion(data)) {
+            type = CaseType.DISABLE_PROFILE_QUESTION;
         }
 
 
@@ -93,7 +96,6 @@ public class CaseMatcherImpl implements CaseMatcher {
 
 
         else {
-            type = CaseType.UNKNOWN;
             LOG.debug("{} MESSAGE TYPE: {}", type, data);
         }
 
@@ -145,10 +147,10 @@ public class CaseMatcherImpl implements CaseMatcher {
     public boolean isOneButton(MessageAndKeyboard data) {
         Keyboard keyboard = data.getKeyboard();
         List<List<KeyboardButton>> buttonRows = keyboard.getButtons();
-        return !keyboard.getOneTime()
-                && buttonRows.size() == 1
-                && buttonRows.get(0).size() == 1
-                && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue());
+        return buttonRows.size() == 1
+                && buttonRows.get(0).size() == 1;
+                //&& buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue());
+                //&& !buttonRows.get(0).get(0).getAction().getPayload().isBlank();
         //&& buttonRows.get(0).get(0).getAction().getLabel().equals("Продолжить просмотр анкет")
         //&& buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.POSITIVE.getValue());
     }
@@ -241,7 +243,8 @@ public class CaseMatcherImpl implements CaseMatcher {
                 && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.POSITIVE.getValue())
                 && buttonRows.get(0).get(1).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
                 && buttonRows.get(0).get(1).getColor().equals(KeyboardButtonColor.DEFAULT.getValue())
-                && message.getText().contains("с тобой");//"Герман, 9 девушек из г. Москва хотят пообщаться с тобой.\n\n1. Посмотреть их анкеты.\n2. Моя анкета."
+                && message.getText().contains("с тобой");
+        //"Герман, 9 девушек из г. Москва хотят пообщаться с тобой.\n\n1. Посмотреть их анкеты.\n2. Моя анкета."
     }
 
     public boolean hasLikeFromSomeone(MessageAndKeyboard data) {
@@ -260,24 +263,13 @@ public class CaseMatcherImpl implements CaseMatcher {
 
     private boolean isQuestionAfterProfile(MessageAndKeyboard data) {
         Message message = data.getMessage();
-//        Keyboard keyboard = data.getKeyboard();
-//        List<List<KeyboardButton>> buttonRows = keyboard.getButtons();
-//        return !keyboard.getOneTime()
-//                && buttonRows.size() == 1
-//                && buttonRows.get(0).size() == 2
-//                && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
-//                && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.POSITIVE.getValue())
-//                && buttonRows.get(0).get(1).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
-//                && buttonRows.get(0).get(1).getColor().equals(KeyboardButtonColor.DEFAULT.getValue())
-//                && message.getText().contains("Заканчивай с вопросом выше");
-                return message.getText().contains("Заканчивай с вопросом выше");
+        return message.getText().contains("Заканчивай с вопросом выше");
         //"Нашли кое-кого для тебя ;) Заканчивай с вопросом выше и увидишь кто это"
     }
 
     private boolean isNoSuchAnswer(MessageAndKeyboard data) {
         Message message = data.getMessage();
-                return message.getText().contains("Нет такого варианта ответа");
-        //"Нет такого варианта ответа"
+        return message.getText().contains("Нет такого варианта ответа");
     }
 
     public boolean isSleeping(MessageAndKeyboard data) {
@@ -333,17 +325,42 @@ public class CaseMatcherImpl implements CaseMatcher {
         //&& message.getText().endsWith("3. Я больше никого не ищу.");
     }
 
+    private boolean isQuestionAfterInactive(MessageAndKeyboard data) {
+        Keyboard keyboard = data.getKeyboard();
+        List<List<KeyboardButton>> buttonRows = keyboard.getButtons();
+
+        return !keyboard.getOneTime()
+                && buttonRows.size() == 2
+                && buttonRows.get(0).size() == 4
+                && buttonRows.get(1).size() == 1
+                && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.NEGATIVE.getValue())
+                && buttonRows.get(1).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && buttonRows.get(1).get(0).getColor().equals(KeyboardButtonColor.POSITIVE.getValue())
+                && buttonRows.get(1).get(0).getAction().getLabel().contains("Смотреть анкеты");
+    }
+
+    private boolean isDisableProfileQuestion(MessageAndKeyboard data) {
+        Message message = data.getMessage();
+        Keyboard keyboard = data.getKeyboard();
+        List<List<KeyboardButton>> buttonRows = keyboard.getButtons();
+
+        return !keyboard.getOneTime()
+                && buttonRows.size() == 1
+                && buttonRows.get(0).size() == 2
+                && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.DEFAULT.getValue())
+                && buttonRows.get(0).get(1).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
+                && buttonRows.get(0).get(1).getColor().equals(KeyboardButtonColor.POSITIVE.getValue())
+                && message.getText().contains("отключить анкету");
+    }
+
     public boolean isProfileUrl(MessageAndKeyboard data) {
         Message message = data.getMessage();
 
         return message.getText().startsWith("Отлично! Надеюсь хорошо проведете время")
                 || message.getText().contains("добавляй в друзья -");
     }
-
-
-    //"Есть взаимная симпатия! Добавляй в друзья - vk.com/id144149953\n\nОлег, 25, Москва"
-    //"Есть взаимная симпатия! Добавляй в друзья - vk.com/id751006895\n\nвикуся, 15, Москва\nищу так чисто мальчика любимого"
-
 
     public boolean notAvailableToContinue(MessageAndKeyboard message) {
         throw new UnsupportedOperationException("Not supported yet");
