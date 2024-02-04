@@ -19,9 +19,9 @@ import java.util.Set;
 
 @Configuration
 @ComponentScan("ru.thevalidator.daivinchikmatcher2")
-public class SpringJavaConfig {
+public class ContextConfig {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SpringJavaConfig.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ContextConfig.class);
 
     @Bean
     public Set<String> matchingWords() {

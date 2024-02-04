@@ -1,17 +1,17 @@
 package ru.thevalidator.daivinchikmatcher2.service.daivinchik.model;
 
-import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.CaseType;
-
 public class DaiVinchikDialogAnswer {
 
     private String text;
-    private CaseType type;
+    private String payload;
+    private CaseType type;  //@TODO: probably is not needed
 
     public DaiVinchikDialogAnswer() {
     }
 
-    public DaiVinchikDialogAnswer(String text, CaseType type) {
+    public DaiVinchikDialogAnswer(String text, String payload, CaseType type) {
         this.text = text;
+        this.payload = payload;
         this.type = type;
     }
 
@@ -31,12 +31,24 @@ public class DaiVinchikDialogAnswer {
         this.type = type;
     }
 
+    public String getPayload() {
+        return payload;
+    }
+
+    public void setPayload(String payload) {
+        this.payload = payload;
+    }
     @Override
     public String toString() {
         return "DaiVinchikDialogAnswer{" +
                 "type='" + type + '\'' +
-                ", text=" + text +
+                ", text='" + text + '\'' +
+                ", payload='" + payload + '\'' +
                 '}';
+    }
+
+    public boolean hasPayload() {
+        return payload != null && !payload.isBlank();
     }
 
 }

@@ -12,9 +12,11 @@ import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.CaseType;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.DaiVinchikDialogAnswer;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keyboard.KeyboardButton;
+import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keyboard.KeyboardButtonAction;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -37,83 +39,114 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
     public DaiVinchikDialogAnswer findAnswer(MessageAndKeyboard data) {
         CaseType type = matcher.detectCase(data);
         LOG.debug("{}", type);
-        String answerText = getAnswerTextByCase(type, data);
-        DaiVinchikDialogAnswer answer = new DaiVinchikDialogAnswer();
-        answer.setType(type);
-        answer.setText(answerText);
-        return answer;
+        return getAnswerTextByCase(type, data);
     }
 
-    private String getAnswerTextByCase(CaseType type, MessageAndKeyboard data) {
-        String text;
+    private DaiVinchikDialogAnswer getAnswerTextByCase(CaseType type, MessageAndKeyboard data) {
+        DaiVinchikDialogAnswer answer = null;
+
+        //String text;
+        KeyboardButtonAction action;
         if (type.equals(CaseType.PROFILE)) {
-            text = getAnswerForProfile(data);
+            action = getActionForProfile(data);
+            answer = createAnswer(type, action);
         } else if (type.equals(CaseType.ONE_BUTTON_ANSWER)) {
-            text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
+            action = data.getKeyboard().getButtons().get(0).get(0).getAction();
+            answer = createAnswer(type, action);
         } else if (type.equals(CaseType.LOCATION)) {
-            text = data.getKeyboard().getButtons().get(1).get(0).getAction().getPayload();
+            action = data.getKeyboard().getButtons().get(1).get(0).getAction();
+            answer = createAnswer(type, action);
         } else if (type.equals(CaseType.QUESTION_AFTER_PROFILE)) {
-            text = getAnswerForThePreviousMessage(data);
-        } else if (type.equals(CaseType.NO_SUCH_ANSWER)) {
-            var b = data.getKeyboard().getButtons();
-            text = b.size() == 1 ? b.get(0).get(0).getAction().getPayload()
-                    : b.get(1).get(0).getAction().getLabel();
+            answer = getAnswerForThePreviousMessage(data);
+//        } else if (type.equals(CaseType.NO_SUCH_ANSWER)) {        //@TODO: check wtf is here
+//            var b = data.getKeyboard().getButtons();
+//            text = b.size() == 1 ? b.get(0).get(0).getAction().getPayload()
+//                    : b.get(1).get(0).getAction().getLabel();
         } else if (type.equals(CaseType.LONG_TIME_AWAY)) {
-            text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
+            action = data.getKeyboard().getButtons().get(0).get(0).getAction();
+            answer = createAnswer(type, action);
         } else if (type.equals(CaseType.SHOW_QUESTION)) {
-            text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
+            action = data.getKeyboard().getButtons().get(0).get(0).getAction();
+            answer = createAnswer(type, action);
         } else if (type.equals(CaseType.WANT_TO_MEET)) {
-            text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
+            action = data.getKeyboard().getButtons().get(0).get(0).getAction();
+            answer = createAnswer(type, action);
         } else if (type.equals(CaseType.ADS_DV)) {
-            text = data.getKeyboard().getButtons().get(0).get(1).getAction().getPayload();
+            action = data.getKeyboard().getButtons().get(0).get(1).getAction();
+            answer = createAnswer(type, action);
         } else if (type.equals(CaseType.ADVICE)) {
-            text = data.getKeyboard().getButtons().get(0).get(1).getAction().getPayload();
+            action = data.getKeyboard().getButtons().get(0).get(1).getAction();
+            answer = createAnswer(type, action);
         } else if (type.equals(CaseType.QUESTION)) {
-            text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
+            action = data.getKeyboard().getButtons().get(0).get(0).getAction();
+            answer = createAnswer(type, action);
         } else if (type.equals(CaseType.SLEEPING)) {
-            text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
+            action = data.getKeyboard().getButtons().get(0).get(0).getAction();
+            answer = createAnswer(type, action);
         } else if (type.equals(CaseType.PROFILE_LIKED_ME)) {
             //@TODO: check if the answer is correct
-            text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
+            action = data.getKeyboard().getButtons().get(0).get(0).getAction();
+            answer = createAnswer(type, action);
         } else if (type.equals(CaseType.SOMEBODY_LIKES_YOU)) {
             //@TODO: check if the answer is correct
-            text = data.getKeyboard().getButtons().get(0).get(1).getAction().getPayload();
+            action = data.getKeyboard().getButtons().get(0).get(1).getAction();
+            answer = createAnswer(type, action);
         } else if (type.equals(CaseType.DISABLE_PROFILE_QUESTION)) {
-            text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
+            action = data.getKeyboard().getButtons().get(0).get(0).getAction();
+            answer = createAnswer(type, action);
         } else if (type.equals(CaseType.TOO_MANY_LIKES)) {
             throw new TooManyLikesForToday(); //@TODO: move to the message handler  ???
         } else if (type.equals(CaseType.CAN_NOT_CONTINUE)) {
             throw new CanNotContinueException(data); //@TODO: move to the message handler ???
         } else {
-            text = getAnswerFromUser(Thread.currentThread().getName(), data);
+            answer = getAnswerFromUser(Thread.currentThread().getName(), type, data);
         }
-        return text;
+        return answer;
         //@TODO: answer-duplication case
         //@TODO: add question after inactive
     }
 
-    private String getAnswerFromUser(String threadName, MessageAndKeyboard data) {
-        String userInputText = null;
+    private DaiVinchikDialogAnswer createAnswer(CaseType type, KeyboardButtonAction action) {
+        return new DaiVinchikDialogAnswer(action.getLabel(), action.getPayload(), type);
+    }
+
+    private DaiVinchikDialogAnswer getAnswerFromUser(String threadName, CaseType type, MessageAndKeyboard data) {
+        Integer buttonNumber = null;
         int result = JOptionPane.CANCEL_OPTION;
 
         StringBuilder sb = new StringBuilder(data.getMessage().getText() + "\n");
-        for (List<KeyboardButton> buttonRow: data.getKeyboard().getButtons()) {
-            for (KeyboardButton button: buttonRow) {
-                sb.append("\nLabel: ").append(button.getAction().getLabel());
-                if (button.getAction().getPayload() != null) {
-                    sb.append(" Payload: ").append(button.getAction().getPayload());
+        List<KeyboardButton> buttons = new ArrayList<>();
+        if (data.getKeyboard() != null) {
+            int counter = 0;
+            for (List<KeyboardButton> buttonRow: data.getKeyboard().getButtons()) {
+                for (KeyboardButton button: buttonRow) {
+                    counter++;
+                    sb.append("\n [ BUTTON №")
+                            .append(counter)
+                            .append(" ] - ");
+
+                    if (button.getAction().getLabel() != null) {
+                        sb.append("Label: ")
+                                .append(button.getAction().getLabel());
+                    }
+
+                    if (button.getAction().getPayload() != null) {
+                        sb.append(" Payload: ")
+                                .append(button.getAction().getPayload());
+                    }
+                    buttons.add(button);
                 }
             }
         }
         String messageInfo = sb.toString();
-        while (result != JOptionPane.OK_OPTION || userInputText.isBlank()) {
+        while (result != JOptionPane.OK_OPTION || buttonNumber == null) {
             JTextArea jTextArea = new JTextArea(messageInfo);
             JTextField answerField = new JTextField();
 
             JPanel panel = new JPanel(new GridLayout(0, 1));
             panel.add(new JLabel("MESSAGE:"));
             panel.add(jTextArea);
-            panel.add(new JLabel("GIVE ANSWER (payload):"));
+            panel.add(new JLabel("GIVE ANSWER  (button number or 0 to stop this account):"));
             panel.add(answerField);
 
             result = JOptionPane.showConfirmDialog(
@@ -124,21 +157,31 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
                     JOptionPane.PLAIN_MESSAGE);
 
             if (result == JOptionPane.OK_OPTION) {
-                userInputText = answerField.getText().trim();
+                try {
+                    if (answerField.getText().trim().equals("0")) {
+                        throw new CanNotContinueException("Stopped manually during getting answer from user");
+                    }
+                    buttonNumber = Integer.parseInt(answerField.getText().trim()) - 1;
+                    if (buttonNumber < 0 || buttonNumber >= buttons.size()) {
+                        buttonNumber = null;
+                    }
+                } catch (NumberFormatException ignored){
+                }
             }
         }
+        var action = buttons.get(buttonNumber).getAction();
 
-        return userInputText;
+        return new DaiVinchikDialogAnswer(action.getLabel(), action.getPayload(), type);
     }
 
-    private String getAnswerForProfile(MessageAndKeyboard data) {
-        String text = data.getKeyboard().getButtons().get(0).get(2).getAction().getPayload();
+    private KeyboardButtonAction getActionForProfile(MessageAndKeyboard data) {
+        KeyboardButtonAction action = data.getKeyboard().getButtons().get(0).get(2).getAction();
         boolean isMatches = false;
         for (String s: data.getMessage().getText().split("\\s")) {
             s = s.toLowerCase();
             for (String w: matchingWords) {
                 if (s.contains(w)) {
-                    text = data.getKeyboard().getButtons().get(0).get(0).getAction().getPayload();
+                    action = data.getKeyboard().getButtons().get(0).get(0).getAction();
                     LOG.info("Match on word {}", w);
                     isMatches = true;
                     break;
@@ -148,10 +191,10 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
                 break;
             }
         }
-        return text;
+        return action;
     }
 
-    private String getAnswerForThePreviousMessage(MessageAndKeyboard data) {
+    private DaiVinchikDialogAnswer getAnswerForThePreviousMessage(MessageAndKeyboard data) {
         LOG.debug("Searching the answer for previous question");
         Message message = messageService.findMessageFromDaiVinchikBefore(data.getMessage());
         data.setMessage(message);
