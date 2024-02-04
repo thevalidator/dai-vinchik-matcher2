@@ -45,7 +45,7 @@
             <AppenderRef ref="Task"/>
             <AppenderRef ref="Console"/>
         </Logger>
-        <Logger name="ru.thevalidator.daivinchikmatcher2.config.SpringJavaConfig" level="debug" additivity="false">
+        <Logger name="ru.thevalidator.daivinchikmatcher2.config.ContextConfig" level="debug" additivity="false">
             <AppenderRef ref="Task"/>
             <AppenderRef ref="Console"/>
         </Logger>

@@ -12,7 +12,7 @@ import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikMissedMes
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.CaseType;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.DaiVinchikDialogAnswer;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.Task;
-import ru.thevalidator.daivinchikmatcher2.statisctic.Statistic;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.statisctic.Statistic;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.SendMessageResultResponse;
 
@@ -20,14 +20,12 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 public class DaiVinchikDialogHandler implements Task {
 
     private static final Logger LOG = LoggerFactory.getLogger(DaiVinchikDialogHandler.class);
     public static final int BASE_DELAY = 8;
-    //public static final Random random = new Random();
     private final DaiVinchikMessageService messageService;
     private final DaiVinchikDialogAnswerService answerService;
     private final DaiVinchikMissedMessageService missedMessageService;
@@ -43,19 +41,18 @@ public class DaiVinchikDialogHandler implements Task {
         this.answerService = answerService;
         this.missedMessageService = missedMessageService;
         this.stats = new Statistic();
-        //this.random = ThreadLocalRandom.current();
         this.random = new Random();
     }
 
     @Override
     public void run() {
-        random.setSeed(System.currentTimeMillis());
-        stats.setName(Thread.currentThread().getName());
-        stats.setStartTime(Instant.now());
-        isActive = true;
+        prepareBeforeStart();
         LOG.debug("Start task");
         MessageAndKeyboard data;
         Integer lastConversationMessageId = messageService.getDaiVinchikLastConversationMessageId();
+        if (lastConversationMessageId < 1) {
+            initDaiVinchikConversation();
+        }
         int messageDelta;
         while (isActive) {
             try {
@@ -74,7 +71,7 @@ public class DaiVinchikDialogHandler implements Task {
                     isActive = false;
                     break;
                 }
-                SendMessageResultResponse resultRs = messageService.sendMessage(answer);
+                SendMessageResultResponse resultRs = messageService.sendAnswerMessage(answer);
                 //@TODO: check for response errors
                 lastConversationMessageId = resultRs.getConversationMessageId();
                 if (answer.getType().equals(CaseType.PROFILE) || answer.getType().equals(CaseType.QUESTION_AFTER_PROFILE)) {
@@ -85,22 +82,22 @@ public class DaiVinchikDialogHandler implements Task {
                     }
                 }
                 int sleepingTime = generateSleepingTime();
-                System.out.printf("[%s] [%03d] (L_%03d/D_%03d) CASE: %s | ANSWER: %s | SLEEPING %d SECONDS\n",
-                        Thread.currentThread().getName(), counter,
-                        stats.getLikesSent(), stats.getDislikesSent(),
+                System.out.printf("[%s] [%03d] (L_%03d/D_%03d/M_%03d) CASE: %s | ANSWER: %s | SLEEPING %d SECONDS\n",
+                        stats.getName(), counter, stats.getLikesSent(),
+                        stats.getDislikesSent(), stats.getMatchesCount(),
                         answer.getType(), answer.getText(), sleepingTime);
                 TimeUnit.SECONDS.sleep(sleepingTime);
             } catch (TooManyLikesForToday e) {
                 if (counter == 1) {
                     SendMessageResultResponse resultRs = messageService
-                            .sendMessage(new DaiVinchikDialogAnswer("1", CaseType.TOO_MANY_LIKES));
+                            .sendAnswerMessage(new DaiVinchikDialogAnswer("1", "1", CaseType.TOO_MANY_LIKES));
                     //@TODO: check for response errors
                     lastConversationMessageId = resultRs.getConversationMessageId();
                 } else {
                     isActive = false;
-                    System.out.printf("[%s] [%03d] (L_%03d/D_%03d) TOO MANY LIKES FOR TODAY\n",
-                            Thread.currentThread().getName(), counter,
-                            stats.getLikesSent(), stats.getDislikesSent());
+                    System.out.printf("[%s] [%03d] (L_%03d/D_%03d/M_%03d) TOO MANY LIKES FOR TODAY\n",
+                            stats.getName(), counter, stats.getLikesSent(),
+                            stats.getDislikesSent(), stats.getMatchesCount());
                 }
             } catch (CanNotContinueException e) {
                 LOG.error("Error on message data: {}", e.getData());
@@ -111,9 +108,25 @@ public class DaiVinchikDialogHandler implements Task {
                 throw new RuntimeException(e);
             }
         }
-        LOG.debug("Finish task [{}] (L_{}/D_{})", counter, stats.getLikesSent(), stats.getDislikesSent());
+        LOG.debug("Finish task [{}] (L_{}/D_{}/M_{})",
+                counter,
+                stats.getLikesSent(),
+                stats.getDislikesSent(),
+                stats.getMatchesCount());
         stats.setFinishTime(Instant.now());
+    }
+
+    private void initDaiVinchikConversation() {
+        //@TODO: check if profile creation state (to avoid one button answer collision)
+        throw new UnsupportedOperationException("Create profile feature is not supported yet");
+    }
+
+    private void prepareBeforeStart() {
         Statistic.addStatisticToGlobal(stats);
+        stats.setName(Thread.currentThread().getName());
+        stats.setStartTime(Instant.now());
+        isActive = true;
+        random.setSeed(System.currentTimeMillis());
     }
 
     private int generateSleepingTime() {
@@ -128,7 +141,7 @@ public class DaiVinchikDialogHandler implements Task {
         var rs = messageService.getDaiVinchikMessagesByConversationId(ids);
         for (Message m: rs) {
             if (m.getFromId().equals(Settings.INSTANCE.getDaiVinchickPeerId())) {
-                LOG.info("MISSED: {}", m);
+                LOG.warn("MISSED: {}", m);
                 String url = missedMessageService.findProfileUrl(m);
                 if (url != null) {
                     stats.increaseMatchesCount();
@@ -142,8 +155,6 @@ public class DaiVinchikDialogHandler implements Task {
         //@TODO: implement
         throw new UnsupportedOperationException("Not supported yet");
     }
-
-
 
 }
 

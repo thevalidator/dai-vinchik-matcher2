@@ -1,4 +1,4 @@
-package ru.thevalidator.daivinchikmatcher2.statisctic;
+package ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.statisctic;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -72,11 +72,12 @@ public class Statistic {
 
     @Override
     public String toString() {
+
         return String.format(("[%s] [%s - %s | %s minute(s)] (L_%03d / D_%03d / M_%03d)"),
                 this.getName(),
-                LocalDateTime.ofInstant(startTime, ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("HH:mm")),
-                LocalDateTime.ofInstant(finishTime, ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("HH:mm")),
-                startTime.until(finishTime, ChronoUnit.MINUTES),
+                startTime == null ? "" : LocalDateTime.ofInstant(startTime, ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("HH:mm")),
+                finishTime == null ? "" : LocalDateTime.ofInstant(finishTime, ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("HH:mm")),
+                (startTime == null || finishTime == null) ? "" : startTime.until(finishTime, ChronoUnit.MINUTES),
                 this.getLikesSent(),
                 this.getDislikesSent(),
                 this.getMatchesCount());

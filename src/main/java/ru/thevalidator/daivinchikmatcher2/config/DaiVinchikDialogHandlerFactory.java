@@ -1,8 +1,6 @@
 package ru.thevalidator.daivinchikmatcher2.config;
 
-import com.vk.api.sdk.client.TransportClient;
-import com.vk.api.sdk.client.VkApiClient;
-import com.vk.api.sdk.client.actors.UserActor;
+import com.vk.api.sdk.httpclient.HttpTransportClient;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,7 +12,7 @@ import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikMissedMes
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.impl.DaiVinchikDialogAnswerServiceImpl;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.impl.DaiVinchikMessageServiceImpl;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.poll.DaiVinchikDialogHandler;
-import ru.thevalidator.daivinchikmatcher2.vk.custom.actor.CustomUserActor;
+import ru.thevalidator.daivinchikmatcher2.vk.VkTools;
 import ru.thevalidator.daivinchikmatcher2.vk.custom.transport.HttpTransportClientWithCustomUserAgent;
 
 import java.util.NoSuchElementException;
@@ -24,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 public class DaiVinchikDialogHandlerFactory implements FactoryBean<DaiVinchikDialogHandler> {
 
-    private static final int MAX_HANDLERS = 4;
+    private static final int MAX_HANDLERS = 2;
     private static final AtomicInteger counter = new AtomicInteger(0);
     private final UserTokenRepository tokenRepository;
     private final DaiVinchikMissedMessageService missedMessageService;
@@ -69,10 +67,13 @@ public class DaiVinchikDialogHandlerFactory implements FactoryBean<DaiVinchikDia
                 throw new IllegalArgumentException("Check tokens, line " + counter.get());
             }
         }
-        TransportClient transportClient = new HttpTransportClientWithCustomUserAgent("Java VK SDK/1.0");
-        VkApiClient vk = new VkApiClient(transportClient);
-        UserActor actor = new CustomUserActor(token);
-        return new DaiVinchikMessageServiceImpl(vk, actor);
+//        HttpTransportClientWithCustomUserAgent http = new HttpTransportClientWithCustomUserAgent(
+//                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
+//                        "AppleWebKit/537.36 (KHTML, like Gecko) " +
+//                        "Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0");
+//        VkTools vkTools = new VkTools(http, token);
+        VkTools vkTools = new VkTools(new HttpTransportClient(), token);
+        return new DaiVinchikMessageServiceImpl(vkTools);
     }
 
     @Override

@@ -19,6 +19,8 @@ public interface DaiVinchikMessageService {
 
     public Integer getDaiVinchikLastConversationMessageId();
 
-    public SendMessageResultResponse sendMessage(DaiVinchikDialogAnswer answer);
+    public SendMessageResultResponse sendAnswerMessage(DaiVinchikDialogAnswer answer);
+
+    public String sendPhotoWithDelay(byte[] image, String tmpFilePath) throws Exception ;
 
 }

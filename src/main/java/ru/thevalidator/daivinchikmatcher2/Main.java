@@ -6,7 +6,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import ru.thevalidator.daivinchikmatcher2.config.DaiVinchikDialogHandlerFactory;
 import ru.thevalidator.daivinchikmatcher2.config.ContextConfig;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.poll.DaiVinchikDialogHandler;
-import ru.thevalidator.daivinchikmatcher2.statisctic.Statistic;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.statisctic.Statistic;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -7,7 +7,6 @@ import com.vk.api.sdk.objects.messages.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import ru.thevalidator.daivinchikmatcher2.exception.CanNotContinueException;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikCaseMatcherService;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.CaseType;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
@@ -40,7 +39,8 @@ public class DaiVinchikCaseMatcherServiceImpl implements DaiVinchikCaseMatcherSe
 
         LOG.trace("MESSAGE: {}", data);
         if (Objects.isNull(data.getKeyboard())) {
-            throw new CanNotContinueException(data);
+            //throw new CanNotContinueException(data);
+            return CaseType.UNKNOWN;
         }
 
         if (isProfile(data)) {
@@ -147,11 +147,10 @@ public class DaiVinchikCaseMatcherServiceImpl implements DaiVinchikCaseMatcherSe
     public boolean isOneButton(MessageAndKeyboard data) {
         Keyboard keyboard = data.getKeyboard();
         List<List<KeyboardButton>> buttonRows = keyboard.getButtons();
-        return !keyboard.getOneTime()
-                && buttonRows.size() == 1
-                && buttonRows.get(0).size() == 1
-                && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
-                && !buttonRows.get(0).get(0).getAction().getPayload().isBlank();
+        return buttonRows.size() == 1
+                && buttonRows.get(0).size() == 1;
+                //&& buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue());
+                //&& !buttonRows.get(0).get(0).getAction().getPayload().isBlank();
         //&& buttonRows.get(0).get(0).getAction().getLabel().equals("Продолжить просмотр анкет")
         //&& buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.POSITIVE.getValue());
     }
@@ -244,7 +243,8 @@ public class DaiVinchikCaseMatcherServiceImpl implements DaiVinchikCaseMatcherSe
                 && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.POSITIVE.getValue())
                 && buttonRows.get(0).get(1).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
                 && buttonRows.get(0).get(1).getColor().equals(KeyboardButtonColor.DEFAULT.getValue())
-                && message.getText().contains("с тобой");//"Герман, 9 девушек из г. Москва хотят пообщаться с тобой.\n\n1. Посмотреть их анкеты.\n2. Моя анкета."
+                && message.getText().contains("с тобой");
+        //"Герман, 9 девушек из г. Москва хотят пообщаться с тобой.\n\n1. Посмотреть их анкеты.\n2. Моя анкета."
     }
 
     public boolean hasLikeFromSomeone(MessageAndKeyboard data) {
@@ -263,16 +263,6 @@ public class DaiVinchikCaseMatcherServiceImpl implements DaiVinchikCaseMatcherSe
 
     private boolean isQuestionAfterProfile(MessageAndKeyboard data) {
         Message message = data.getMessage();
-//        Keyboard keyboard = data.getKeyboard();
-//        List<List<KeyboardButton>> buttonRows = keyboard.getButtons();
-//        return !keyboard.getOneTime()
-//                && buttonRows.size() == 1
-//                && buttonRows.get(0).size() == 2
-//                && buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
-//                && buttonRows.get(0).get(0).getColor().equals(KeyboardButtonColor.POSITIVE.getValue())
-//                && buttonRows.get(0).get(1).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue())
-//                && buttonRows.get(0).get(1).getColor().equals(KeyboardButtonColor.DEFAULT.getValue())
-//                && message.getText().contains("Заканчивай с вопросом выше");
         return message.getText().contains("Заканчивай с вопросом выше");
         //"Нашли кое-кого для тебя ;) Заканчивай с вопросом выше и увидишь кто это"
     }
@@ -280,7 +270,6 @@ public class DaiVinchikCaseMatcherServiceImpl implements DaiVinchikCaseMatcherSe
     private boolean isNoSuchAnswer(MessageAndKeyboard data) {
         Message message = data.getMessage();
         return message.getText().contains("Нет такого варианта ответа");
-        //"Нет такого варианта ответа"
     }
 
     public boolean isSleeping(MessageAndKeyboard data) {
@@ -372,11 +361,6 @@ public class DaiVinchikCaseMatcherServiceImpl implements DaiVinchikCaseMatcherSe
         return message.getText().startsWith("Отлично! Надеюсь хорошо проведете время")
                 || message.getText().contains("добавляй в друзья -");
     }
-
-
-    //"Есть взаимная симпатия! Добавляй в друзья - vk.com/id144149953\n\nОлег, 25, Москва"
-    //"Есть взаимная симпатия! Добавляй в друзья - vk.com/id751006895\n\nвикуся, 15, Москва\nищу так чисто мальчика любимого"
-
 
     public boolean notAvailableToContinue(MessageAndKeyboard message) {
         throw new UnsupportedOperationException("Not supported yet");
