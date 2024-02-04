@@ -21,6 +21,8 @@
 - [ ] message service impl line 142: check what if no new messages
 - [ ] fix answer for 2 buttons profile correct prompt
 - [x] fix stopping when on  start the last message is too many like
+- [ ] Make save and show stats if exception occurs
+- [ ] handle errors
 - [ ] feature 3
 - [ ] feature 3
 - [ ] feature 3
