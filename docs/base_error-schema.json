@@ -1,0 +1,44 @@
+{
+  "type": "object",
+  "properties": {
+    "error_code": {
+      "type": "integer",
+      "description": "Error code",
+      "required": true
+    },
+    "error_subcode": {
+      "type": "integer",
+      "description": "Error subcode"
+    },
+    "error_msg": {
+      "type": "string",
+      "description": "Error message"
+    },
+    "error_text": {
+      "type": "string",
+      "description": "Localized error message"
+    },
+    "request_params": {
+      "type": "array",
+      "items": {
+        "base_request_param": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "Parameter name",
+              "required": true
+            },
+            "value": {
+              "type": "string",
+              "description": "Parameter value",
+              "required": true
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
