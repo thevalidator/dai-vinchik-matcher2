@@ -4,6 +4,9 @@
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p [%t] %c{1}:%L - %m%n" charset="UTF-8"/>
         </Console>
+        <File name="Common" fileName="logs/dv.log">
+            <PatternLayout pattern="%d %-5p %45c{1.} [%3L] [%t] %m%n" charset="UTF-8"/>
+        </File>
         <File name="Answer" fileName="logs/answer_debug.log">
             <PatternLayout pattern="%d %-5p %45c{1.} [%3L] [%t] %m%n" charset="UTF-8"/>
         </File>
@@ -21,6 +24,7 @@
     <Loggers>
         <Root level="info">
             <AppenderRef ref="Console"/>
+            <AppenderRef ref="Common"/>
         </Root>
         <Logger name="ru.thevalidator.daivinchikmatcher2.task.longpoll" level="info"/>
         <Logger name="ru.thevalidator.daivinchikmatcher2.task.request" level="info"/>
