@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import ru.thevalidator.daivinchikmatcher2.config.settings.Settings;
 import ru.thevalidator.daivinchikmatcher2.exception.CanNotContinueException;
 import ru.thevalidator.daivinchikmatcher2.exception.CanNotLoadImageToVkServerException;
+import ru.thevalidator.daivinchikmatcher2.exception.UnexpectedResponseException;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikMessageService;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.DaiVinchikDialogAnswer;
 import ru.thevalidator.daivinchikmatcher2.util.data.SerializerUtil;
@@ -70,7 +71,7 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
         Message message;
         do {
             if (previousConversationMsgId <= 0) { //@TODO: 0 if no dialog with DV => now get error (line 55 add check for id == 0)
-                throw new CanNotContinueException("Conversation ID is equals zero");
+                throw new CanNotContinueException("Previous conversation ID equals " + previousConversationMsgId);
             }
             message = getDaiVinchikMessagesByConversationId(List.of(previousConversationMsgId--)).get(0);
         } while (isNotFromDaiVinchik(message.getFromId()));
@@ -132,20 +133,20 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
         try {
             String json = vk.messages()
                     .getConversationsById(actor, Settings.INSTANCE.getDaiVinchickPeerId())
-                    .executeAsRaw()
-                    .getJson()
-                    .getAsString();
+                    .executeAsRaw().getContent();
+                    //.getJson()
+                    //.getAsString();
             LOG.debug("Receive conversations by id response: {}", json);
             GetConversationsByIdResponse rs = SerializerUtil.readJson(json, Response.class).getResponse();
-            //@TODO: extract method for checking
-            if (rs.getCount() != 1) {
+            if (rs == null) {
+                throw new UnexpectedResponseException("Response: " + json);
+            } else if (rs.getCount() != 1) {  //@TODO: extract method for checking
                 throw new IllegalArgumentException("Count=" + rs.getCount() + ", but should be 1");
             }
             return rs.getItems().get(0);
         } catch (ClientException e) {
             throw new RuntimeException(e);
         }
-        //@TODO: handle all exceptions and errors: https://dev.vk.com/ru/method/messages.getConversationsById
     }
 
     private Message getMessageById(Integer messageId) {
@@ -163,7 +164,6 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
         } catch (ApiException | ClientException e) {
             throw new RuntimeException(e);
         }
-        //@TODO: handle all exceptions and errors: https://dev.vk.com/ru/method/messages.getById
     }
 
     private List<Message> getMessageByConversationId(List<Integer> ids) {

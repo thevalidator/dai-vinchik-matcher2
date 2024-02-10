@@ -6,46 +6,44 @@ import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.httpclient.HttpTransportClient;
 import com.vk.api.sdk.objects.users.Fields;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.thevalidator.daivinchikmatcher2.vk.custom.actor.CustomUserActor;
 
 import java.util.List;
 
 public class VkTools {
 
+    public static final Logger LOG = LoggerFactory.getLogger(VkTools.class);
     private final VkApiClient vk;
     private final UserActor actor;
 
-    public VkTools(VkApiClient vk, UserActor actor) {
+    public VkTools(VkApiClient vk, UserActor actor) throws ClientException, ApiException {
         this.vk = vk;
         this.actor = actor;
         setActorId();
     }
-    public VkTools(String token) {
+
+    public VkTools(String token) throws ClientException, ApiException {
         this.vk = new VkApiClient(new HttpTransportClient());
         this.actor = new CustomUserActor(token);
         setActorId();
     }
 
-    public VkTools(HttpTransportClient httpTransportClient, String token) {
+    public VkTools(HttpTransportClient httpTransportClient, String token) throws ClientException, ApiException {
         this.vk = new VkApiClient(httpTransportClient);
         this.actor = new CustomUserActor(token);
         setActorId();
     }
 
-    private void setActorId() {
+    private void setActorId() throws ClientException, ApiException {
         if (actor instanceof CustomUserActor) {
-            try {
-                var c = vk.users().get(actor).fields(List.of(Fields.CONTACTS)).execute();
-                System.out.println(c);
-                Long id = c.get(0).getId();
-                ((CustomUserActor) actor).setId(id);
-                System.out.println(">> USER ID: " + id);
-            } catch (ApiException | ClientException ignored) {
-                //throw new RuntimeException(ignored);
-            }
+            var c = vk.users().get(actor).fields(List.of(Fields.CONTACTS)).execute();
+            Long id = c.get(0).getId();
+            ((CustomUserActor) actor).setId(id);
+            LOG.debug("USER ID: {}", id);
         }
     }
-
 
     public VkApiClient getVk() {
         return vk;

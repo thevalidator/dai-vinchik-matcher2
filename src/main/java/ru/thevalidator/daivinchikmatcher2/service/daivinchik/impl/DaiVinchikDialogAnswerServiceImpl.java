@@ -43,9 +43,8 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
     }
 
     private DaiVinchikDialogAnswer getAnswerTextByCase(CaseType type, MessageAndKeyboard data) {
-        DaiVinchikDialogAnswer answer = null;
+        DaiVinchikDialogAnswer answer;
 
-        //String text;
         KeyboardButtonAction action;
         if (type.equals(CaseType.PROFILE)) {
             action = getActionForProfile(data);
@@ -58,10 +57,6 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
             answer = createAnswer(type, action);
         } else if (type.equals(CaseType.QUESTION_AFTER_PROFILE)) {
             answer = getAnswerForThePreviousMessage(data);
-//        } else if (type.equals(CaseType.NO_SUCH_ANSWER)) {        //@TODO: check wtf is here
-//            var b = data.getKeyboard().getButtons();
-//            text = b.size() == 1 ? b.get(0).get(0).getAction().getPayload()
-//                    : b.get(1).get(0).getAction().getLabel();
         } else if (type.equals(CaseType.LONG_TIME_AWAY)) {
             action = data.getKeyboard().getButtons().get(0).get(0).getAction();
             answer = createAnswer(type, action);
@@ -84,20 +79,18 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
             action = data.getKeyboard().getButtons().get(0).get(0).getAction();
             answer = createAnswer(type, action);
         } else if (type.equals(CaseType.PROFILE_LIKED_ME)) {
-            //@TODO: check if the answer is correct
             action = data.getKeyboard().getButtons().get(0).get(0).getAction();
             answer = createAnswer(type, action);
         } else if (type.equals(CaseType.SOMEBODY_LIKES_YOU)) {
-            //@TODO: check if the answer is correct
             action = data.getKeyboard().getButtons().get(0).get(1).getAction();
             answer = createAnswer(type, action);
         } else if (type.equals(CaseType.DISABLE_PROFILE_QUESTION)) {
             action = data.getKeyboard().getButtons().get(0).get(0).getAction();
             answer = createAnswer(type, action);
         } else if (type.equals(CaseType.TOO_MANY_LIKES)) {
-            throw new TooManyLikesForToday(); //@TODO: move to the message handler  ???
+            throw new TooManyLikesForToday();
         } else if (type.equals(CaseType.CAN_NOT_CONTINUE)) {
-            throw new CanNotContinueException(data); //@TODO: move to the message handler ???
+            throw new CanNotContinueException(data);
         } else {
             answer = getAnswerFromUser(Thread.currentThread().getName(), type, data);
         }

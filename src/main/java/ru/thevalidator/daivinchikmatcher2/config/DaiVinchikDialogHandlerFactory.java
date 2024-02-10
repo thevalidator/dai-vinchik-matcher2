@@ -1,8 +1,11 @@
 package ru.thevalidator.daivinchikmatcher2.config;
 
+import com.vk.api.sdk.exceptions.ApiException;
+import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.httpclient.HttpTransportClient;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.thevalidator.daivinchikmatcher2.repository.UserTokenRepository;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikCaseMatcherService;
@@ -34,7 +37,7 @@ public class DaiVinchikDialogHandlerFactory implements FactoryBean<DaiVinchikDia
     public DaiVinchikDialogHandlerFactory(UserTokenRepository tokenRepository,
                                           DaiVinchikMissedMessageService missedMessageService,
                                           DaiVinchikCaseMatcherService caseMatcher,
-                                          Set<String> matchingWords) {
+                                          @Qualifier("matching_words") Set<String> matchingWords) {
         this.tokenRepository = tokenRepository;
         this.missedMessageService = missedMessageService;
         this.caseMatcher = caseMatcher;
@@ -46,7 +49,7 @@ public class DaiVinchikDialogHandlerFactory implements FactoryBean<DaiVinchikDia
     }
 
     @Override
-    public DaiVinchikDialogHandler getObject() {
+    public DaiVinchikDialogHandler getObject() throws ClientException, ApiException {
         if (counter.incrementAndGet() > MAX_HANDLERS) {
             throw new RuntimeException("Too many handlers, maximum allowed: " + MAX_HANDLERS);
         }
@@ -59,7 +62,7 @@ public class DaiVinchikDialogHandlerFactory implements FactoryBean<DaiVinchikDia
         return new DaiVinchikDialogHandler(messageService, answerService, missedMessageService);
     }
 
-    private DaiVinchikMessageService getDaiVinchikMessageService(String token) {
+    private DaiVinchikMessageService getDaiVinchikMessageService(String token) throws ClientException, ApiException {
         if (token == null) {
             if (tokenRepository.getTokens().isEmpty()) {
                 throw new NoSuchElementException("No more tokens found");
