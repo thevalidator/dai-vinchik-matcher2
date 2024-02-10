@@ -59,6 +59,9 @@
         <Logger name="ru.thevalidator.daivinchikmatcher2.Main" level="info" additivity="false">
             <AppenderRef ref="Statistic"/>
         </Logger>
+        <Logger name="ru.thevalidator.daivinchikmatcher2.service.daivinchik.impl.ProfileGeneratorImpl" level="debug" additivity="false">
+            <AppenderRef ref="Task"/>
+        </Logger>
 
     </Loggers>
 </Configuration>

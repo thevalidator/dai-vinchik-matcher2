@@ -180,8 +180,8 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
     }
 
     @Override
-    public String sendPhotoWithDelay(byte[] image, String tmpFilePath) throws Exception {
-        SaveMessagesPhotoResponse photoResponse = getSaveMessagesPhotoResponse(image, tmpFilePath);
+    public String sendPhotoWithDelay(String tmpFilePath) throws Exception {
+        SaveMessagesPhotoResponse photoResponse = getSaveMessagesPhotoResponse(tmpFilePath);
         long timestamp = System.currentTimeMillis();
         String rs = vk.messages()
                 .sendUserIds(actor)
@@ -194,7 +194,7 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
         return rs;
     }
 
-    private SaveMessagesPhotoResponse getSaveMessagesPhotoResponse(byte[] image, String tmpFilePath) throws Exception {
+    private SaveMessagesPhotoResponse getSaveMessagesPhotoResponse(String tmpFilePath) throws Exception {
         MessageUploadResponse uploadPhotoResponse = null;
         File file = new File(tmpFilePath);
         int attemptCount = 0;
@@ -205,12 +205,6 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
 
             var uri = uploadServerUrlResponse.getUploadUrl();
             LOG.debug(uri.toString());
-
-
-            try (FileOutputStream outputStream = new FileOutputStream(file)) {
-                outputStream.write(image);
-            }
-            TimeUnit.SECONDS.sleep(1);
 
             uploadPhotoResponse = vk.upload().photoMessage(uri.toString(), file).execute();
             LOG.debug(uploadPhotoResponse.toString());
@@ -228,12 +222,6 @@ public class DaiVinchikMessageServiceImpl implements DaiVinchikMessageService {
                 .hash(uploadPhotoResponse.getHash())
                 .execute();
         LOG.debug(savePhotoResponse.toString());
-
-        try {
-            Files.delete(file.toPath());
-        } catch (IIOException e) {
-            LOG.error(e.getMessage());
-        }
 
         return savePhotoResponse.get(0);
     }

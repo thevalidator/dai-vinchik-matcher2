@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import ru.thevalidator.daivinchikmatcher2.Main;
 import ru.thevalidator.daivinchikmatcher2.exception.CanNotContinueException;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.profile.settings.ProfileGeneratorSettings;
+import ru.thevalidator.daivinchikmatcher2.util.ImageCheckerUtil;
 import ru.thevalidator.daivinchikmatcher2.util.data.SerializerUtil;
 
 import java.io.BufferedReader;
@@ -28,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Configuration
 @ComponentScan("ru.thevalidator.daivinchikmatcher2")
@@ -184,6 +187,33 @@ public class ContextConfig {
         Path path = Paths.get("data/config/profile_generator.json");
         String json = Files.readString(path);
         return SerializerUtil.readJson(json, ProfileGeneratorSettings.class);
+    }
+
+    @Bean("femalePics")
+    public List<String> femalePics() throws IOException {
+        List<String> femalePics = readAvatarFolder("data/profile/female/avatar");
+        LOG.debug("Loaded female avatars: {}", femalePics.size());
+        checkCollection(femalePics);
+        return femalePics;
+    }
+
+    @Bean("malePics")
+    public List<String> malePics() throws IOException {
+        List<String> malePics = readAvatarFolder("data/profile/male/avatar");
+        LOG.debug("Loaded male avatars: {}", malePics.size());
+        checkCollection(malePics);
+        return malePics;
+    }
+
+    private List<String> readAvatarFolder(String dir) throws IOException {
+        try (Stream<Path> stream = Files.list(Paths.get(dir))) {
+            return stream
+                    .filter(file -> !Files.isDirectory(file))
+                    .map(Path::toAbsolutePath)
+                    .map(Path::toString)
+                    .filter(ImageCheckerUtil::hasRequiredExtension)
+                    .collect(Collectors.toList());
+        }
     }
 
 }

@@ -1,5 +1,7 @@
 package ru.thevalidator.daivinchikmatcher2.service.daivinchik.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -18,12 +20,16 @@ import static ru.thevalidator.daivinchikmatcher2.util.RandomSelectByWeightUtil.g
 @Component
 public class ProfileGeneratorImpl implements ProfileGenerator {
 
+    public static final Logger LOG = LoggerFactory.getLogger(ProfileGeneratorImpl.class);
+
     private final ProfileGeneratorSettings settings;
     private final Map<String, Integer> cities;
     private final Set<String> maleNames;
     private final Set<String> femaleNames;
     private final List<String> maleText;
     private final List<String> femaleText;
+    private final List<String> malePics;
+    private final List<String> femalePics;
 
 
     @Autowired
@@ -32,13 +38,17 @@ public class ProfileGeneratorImpl implements ProfileGenerator {
                                 @Qualifier("maleNames") Set<String> maleNames,
                                 @Qualifier("femaleNames") Set<String> femaleNames,
                                 @Qualifier("maleText") List<String> maleText,
-                                @Qualifier("femaleText") List<String> femaleText) {
+                                @Qualifier("femaleText") List<String> femaleText,
+                                @Qualifier("malePics") List<String> malePics,
+                                @Qualifier("femalePics") List<String> femalePics) {
         this.settings = profileGeneratorSettings;
         this.cities = cities;
         this.maleNames = maleNames;
         this.femaleNames = femaleNames;
         this.maleText = maleText;
         this.femaleText = femaleText;
+        this.malePics = malePics;
+        this.femalePics = femalePics;
     }
 
 
@@ -50,6 +60,7 @@ public class ProfileGeneratorImpl implements ProfileGenerator {
         String city = getRandomValue(cities);
         String name = userGender.equals(Gender.FEMALE) ? getRandomValue(femaleNames) : getRandomValue(maleNames);
         String text = userGender.equals(Gender.FEMALE) ? getRandomValue(femaleText) : getRandomValue(maleText);
+        String avatar = userGender.equals(Gender.FEMALE) ? getRandomValue(femalePics) : getRandomValue(malePics);
 
         DaiVinchikUserProfile profile = new DaiVinchikUserProfile();
         profile.setAge(age);
@@ -58,7 +69,9 @@ public class ProfileGeneratorImpl implements ProfileGenerator {
         profile.setCity(city);
         profile.setName(name);
         profile.setProfileText(text);
-//        profile.setPhoto();
+        profile.setPhoto(avatar);
+
+        LOG.debug("Profile generated: {}", profile);
 
         return profile;
     }

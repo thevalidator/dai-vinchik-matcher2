@@ -8,8 +8,7 @@ public class DaiVinchikUserProfile {
     private String city;
     private String name;
     private String profileText;
-
-//private <?> photo;
+    private String photo;
 
 
     public int getAge() {
@@ -60,6 +59,14 @@ public class DaiVinchikUserProfile {
         this.profileText = profileText;
     }
 
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
     @Override
     public String toString() {
         return "DaiVinchikUserProfile{" +
@@ -69,7 +76,9 @@ public class DaiVinchikUserProfile {
                 ", city='" + city + '\'' +
                 ", name='" + name + '\'' +
                 ", profileText='" + profileText + '\'' +
+                ", photo='" + photo + '\'' +
                 '}';
     }
+
 
 }

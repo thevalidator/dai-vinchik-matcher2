@@ -21,6 +21,6 @@ public interface DaiVinchikMessageService {
 
     public SendMessageResultResponse sendAnswerMessage(DaiVinchikDialogAnswer answer);
 
-    public String sendPhotoWithDelay(byte[] image, String tmpFilePath) throws Exception ;
+    public String sendPhotoWithDelay(String tmpFilePath) throws Exception ;
 
 }
