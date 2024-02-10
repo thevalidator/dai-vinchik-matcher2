@@ -37,7 +37,7 @@ public class DaiVinchikDialogHandlerFactory implements FactoryBean<DaiVinchikDia
     public DaiVinchikDialogHandlerFactory(UserTokenRepository tokenRepository,
                                           DaiVinchikMissedMessageService missedMessageService,
                                           DaiVinchikCaseMatcherService caseMatcher,
-                                          @Qualifier("matching_words") Set<String> matchingWords) {
+                                          @Qualifier("matchingWords") Set<String> matchingWords) {
         this.tokenRepository = tokenRepository;
         this.missedMessageService = missedMessageService;
         this.caseMatcher = caseMatcher;

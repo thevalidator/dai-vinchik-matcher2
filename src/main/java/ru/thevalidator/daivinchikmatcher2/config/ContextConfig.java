@@ -6,9 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import ru.thevalidator.daivinchikmatcher2.Main;
+import ru.thevalidator.daivinchikmatcher2.exception.CanNotContinueException;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.profile.settings.ProfileGeneratorSettings;
-import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.profile.settings.gender.GenderToSearchSettings;
-import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.profile.settings.gender.UserGenderSettings;
 import ru.thevalidator.daivinchikmatcher2.util.data.SerializerUtil;
 
 import java.io.BufferedReader;
@@ -21,8 +20,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -54,7 +56,7 @@ public class ContextConfig {
         return version;
     }
 
-    @Bean("matching_words")
+    @Bean("matchingWords")
     public Set<String> matchingWords() throws IOException {
         Set<String> words = new HashSet<>();
         try (BufferedReader br = new BufferedReader(
@@ -73,36 +75,73 @@ public class ContextConfig {
 
     @Bean("maleNames")
     public Set<String> maleNames() throws IOException {
-        Set<String> maleNames = new HashSet<>();
-        try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(new FileInputStream("data/profile/male.txt"),
-                        StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (!line.isBlank()) {
-                    maleNames.add(line.trim());
-                }
-            }
-        }
+        Set<String> maleNames = readNames("data/profile/male/name.txt");
         LOG.debug("Loaded male names: {}", maleNames.size());
+        checkCollection(maleNames);
         return maleNames;
     }
 
     @Bean("femaleNames")
     public Set<String> femaleNames() throws IOException {
-        Set<String> femaleNames = new HashSet<>();
+        Set<String> femaleNames = readNames("data/profile/female/name.txt");
+        LOG.debug("Loaded female names: {}", femaleNames.size());
+        checkCollection(femaleNames);
+        return femaleNames;
+    }
+
+    private Set<String> readNames(String path) throws IOException {
+        Set<String> names = new HashSet<>();
         try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(new FileInputStream("data/profile/female.txt"),
+                new InputStreamReader(new FileInputStream(path),
                         StandardCharsets.UTF_8))) {
             String line;
             while ((line = br.readLine()) != null) {
                 if (!line.isBlank()) {
-                    femaleNames.add(line.trim());
+                    names.add(line.trim());
                 }
             }
         }
-        LOG.debug("Loaded female names: {}", femaleNames.size());
-        return femaleNames;
+        return names;
+    }
+
+    @Bean("maleText")
+    public List<String> maleProfileText() throws IOException {
+        List<String> maleTexts = readProfileTextData("data/profile/male/profile_text.txt");
+        LOG.debug("Loaded male texts: {}", maleTexts.size());
+        checkCollection(maleTexts);
+        return maleTexts;
+    }
+
+    @Bean("femaleText")
+    public List<String> femaleProfileText() throws IOException {
+        List<String> femaleTexts = readProfileTextData("data/profile/female/profile_text.txt");
+        LOG.debug("Loaded female texts: {}", femaleTexts.size());
+        checkCollection(femaleTexts);
+        return femaleTexts;
+    }
+
+    private List<String> readProfileTextData(String path) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                new FileInputStream(path), StandardCharsets.UTF_8))) {
+            List<String> descriptions = new ArrayList<>();
+            String line;
+            StringBuilder sb = new StringBuilder();
+            boolean isAppending = false;
+            while ((line = reader.readLine()) != null && !line.isBlank()) {
+                if (line.startsWith("=>")) {
+                    sb.setLength(0);
+                    isAppending = true;
+                } else if (line.startsWith("<=")) {
+                    descriptions.add(sb.toString().trim());
+                    isAppending = false;
+                } else {
+                    if (isAppending) {
+                        sb.append(line).append("\n");
+                    }
+                }
+            }
+            return descriptions;
+        }
     }
 
     @Bean("cities")
@@ -124,19 +163,27 @@ public class ContextConfig {
             }
         }
         LOG.debug("Loaded cities: {}", cities.size());
+        checkCollection(cities);
         return cities;
+    }
+
+    private void checkCollection(Object data) {
+        boolean isEmpty = true;
+        if (data instanceof Collection) {
+            isEmpty = ((Collection<?>) data).isEmpty();
+        } else if (data instanceof Map) {
+            isEmpty = ((Map<?, ?>) data).isEmpty();
+        }
+        if (isEmpty) {
+            throw new CanNotContinueException("No data found");
+        }
     }
 
     @Bean
     public ProfileGeneratorSettings profileGeneratorSettings() throws IOException {
         Path path = Paths.get("data/config/profile_generator.json");
         String json = Files.readString(path);
-
         return SerializerUtil.readJson(json, ProfileGeneratorSettings.class);
-
-//        UserGenderSettings userGender = new UserGenderSettings(50, 50);
-//        GenderToSearchSettings genderToSearch = new GenderToSearchSettings(0, 33, 0);
-//        return new ProfileGeneratorSettings(18, 28, userGender, genderToSearch);
     }
 
 }
