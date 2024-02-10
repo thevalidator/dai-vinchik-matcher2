@@ -1,5 +1,7 @@
 package ru.thevalidator.daivinchikmatcher2;
 
+import com.vk.api.sdk.exceptions.ApiException;
+import com.vk.api.sdk.exceptions.ClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -25,9 +27,13 @@ public class Main {
         List<Thread> threads = new ArrayList<>();
         int counter = 0;
         while (factory.hasObject()) {
-            DaiVinchikDialogHandler service = factory.getObject();
-            Thread thread = new Thread(service, "account - " + ++counter);
-            threads.add(thread);
+            try {
+                DaiVinchikDialogHandler service = factory.getObject();
+                Thread thread = new Thread(service, "account - " + ++counter);
+                threads.add(thread);
+            } catch (ClientException | ApiException e) {
+                LOG.error(e.getMessage());
+            }
         }
 
         for (Thread thread: threads) {

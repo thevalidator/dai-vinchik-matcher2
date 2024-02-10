@@ -30,7 +30,7 @@ public class UserTokenRepositoryImpl implements UserTokenRepository {
         for (String token: tokens) {
             tokenQueue.offer(token);
         }
-        LOG.debug("Loaded {} tokens", tokens.size());
+        LOG.debug("Loaded tokens: {}", tokens.size());
     }
 
     private List<String> readTokens() {

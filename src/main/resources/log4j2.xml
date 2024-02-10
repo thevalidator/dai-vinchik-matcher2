@@ -18,6 +18,9 @@
         </File>
         <File name="Statistic" fileName="logs/statistic.log">
             <PatternLayout pattern="%-5p %m%n" charset="UTF-8"/>
+            <Filters>
+                <ThresholdFilter level="warn" onMatch="DENY" onMismatch="ACCEPT" />
+            </Filters>
         </File>
     </Appenders>
 
