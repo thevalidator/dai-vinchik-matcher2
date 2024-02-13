@@ -49,13 +49,15 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
         if (type.equals(CaseType.PROFILE)) {
             action = getActionForProfile(data);
             answer = createAnswer(type, action);
+        } else if (type.equals(CaseType.PROFILE_FILLING)) {
+            answer = new DaiVinchikDialogAnswer(null, null, type);
         } else if (type.equals(CaseType.ONE_BUTTON_ANSWER)) {
             action = data.getKeyboard().getButtons().get(0).get(0).getAction();
             answer = createAnswer(type, action);
         } else if (type.equals(CaseType.LOCATION)) {
             action = data.getKeyboard().getButtons().get(1).get(0).getAction();
             answer = createAnswer(type, action);
-        } else if (type.equals(CaseType.QUESTION_AFTER_PROFILE)) {
+        } else if (type.equals(CaseType.FINISH_PREVIOUS)) { //instead of QUESTION_AFTER_PROFILE
             answer = getAnswerForThePreviousMessage(data);
         } else if (type.equals(CaseType.LONG_TIME_AWAY)) {
             action = data.getKeyboard().getButtons().get(0).get(0).getAction();
@@ -82,7 +84,7 @@ public class DaiVinchikDialogAnswerServiceImpl implements DaiVinchikDialogAnswer
             action = data.getKeyboard().getButtons().get(0).get(0).getAction();
             answer = createAnswer(type, action);
         } else if (type.equals(CaseType.SOMEBODY_LIKES_YOU)) {
-            action = data.getKeyboard().getButtons().get(0).get(1).getAction();
+            action = data.getKeyboard().getButtons().get(0).get(0).getAction(); //@TODO: was 0-1, check if 0-0 is always correct
             answer = createAnswer(type, action);
         } else if (type.equals(CaseType.DISABLE_PROFILE_QUESTION)) {
             action = data.getKeyboard().getButtons().get(0).get(0).getAction();

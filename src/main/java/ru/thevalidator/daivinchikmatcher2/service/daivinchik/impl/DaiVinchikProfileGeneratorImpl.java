@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import ru.thevalidator.daivinchikmatcher2.service.daivinchik.ProfileGenerator;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikProfileGenerator;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.profile.DaiVinchikUserProfile;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.profile.Gender;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.profile.settings.ProfileGeneratorSettings;
@@ -18,9 +18,9 @@ import java.util.Set;
 import static ru.thevalidator.daivinchikmatcher2.util.RandomSelectByWeightUtil.getRandomValue;
 
 @Component
-public class ProfileGeneratorImpl implements ProfileGenerator {
+public class DaiVinchikProfileGeneratorImpl implements DaiVinchikProfileGenerator {
 
-    public static final Logger LOG = LoggerFactory.getLogger(ProfileGeneratorImpl.class);
+    public static final Logger LOG = LoggerFactory.getLogger(DaiVinchikProfileGeneratorImpl.class);
 
     private final ProfileGeneratorSettings settings;
     private final Map<String, Integer> cities;
@@ -33,14 +33,14 @@ public class ProfileGeneratorImpl implements ProfileGenerator {
 
 
     @Autowired
-    public ProfileGeneratorImpl(ProfileGeneratorSettings profileGeneratorSettings,
-                                @Qualifier("cities") Map<String, Integer> cities,
-                                @Qualifier("maleNames") Set<String> maleNames,
-                                @Qualifier("femaleNames") Set<String> femaleNames,
-                                @Qualifier("maleText") List<String> maleText,
-                                @Qualifier("femaleText") List<String> femaleText,
-                                @Qualifier("malePics") List<String> malePics,
-                                @Qualifier("femalePics") List<String> femalePics) {
+    public DaiVinchikProfileGeneratorImpl(ProfileGeneratorSettings profileGeneratorSettings,
+                                          @Qualifier("cities") Map<String, Integer> cities,
+                                          @Qualifier("maleNames") Set<String> maleNames,
+                                          @Qualifier("femaleNames") Set<String> femaleNames,
+                                          @Qualifier("maleText") List<String> maleText,
+                                          @Qualifier("femaleText") List<String> femaleText,
+                                          @Qualifier("malePics") List<String> malePics,
+                                          @Qualifier("femalePics") List<String> femalePics) {
         this.settings = profileGeneratorSettings;
         this.cities = cities;
         this.maleNames = maleNames;
@@ -53,7 +53,7 @@ public class ProfileGeneratorImpl implements ProfileGenerator {
 
 
     @Override
-    public DaiVinchikUserProfile generateProfile() {
+    public DaiVinchikUserProfile generateRandomProfile() {
         Gender userGender = Gender.valueOf(getRandomValue(settings.getUserGender().getMapOfValues()));
         Gender genderToSearch = Gender.valueOf(getRandomValue(settings.getGenderToSearch().getMapOfValues()));
         int age = new Random().nextInt(settings.getMaxAge() - settings.getMinAge() + 1) + settings.getMinAge();
@@ -74,6 +74,24 @@ public class ProfileGeneratorImpl implements ProfileGenerator {
         LOG.debug("Profile generated: {}", profile);
 
         return profile;
+    }
+
+    @Override
+    public DaiVinchikUserProfile generateRandomFemaleProfile() {
+        //@TODO: implement method
+        throw new UnsupportedOperationException("Not supported yet");
+    }
+
+    @Override
+    public DaiVinchikUserProfile generateRandomMaleProfile() {
+        //@TODO: implement method
+        throw new UnsupportedOperationException("Not supported yet");
+    }
+
+    @Override
+    public DaiVinchikUserProfile generateCustomProfile() {
+        //@TODO: implement method
+        throw new UnsupportedOperationException("Not supported yet");
     }
 
 }

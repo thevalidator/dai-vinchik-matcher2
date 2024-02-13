@@ -12,11 +12,11 @@ import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikCaseMatch
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikDialogAnswerService;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikMessageService;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikMissedMessageService;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikProfileService;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.impl.DaiVinchikDialogAnswerServiceImpl;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.impl.DaiVinchikMessageServiceImpl;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.poll.DaiVinchikDialogHandler;
 import ru.thevalidator.daivinchikmatcher2.vk.VkTools;
-import ru.thevalidator.daivinchikmatcher2.vk.custom.transport.HttpTransportClientWithCustomUserAgent;
 
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -30,6 +30,7 @@ public class DaiVinchikDialogHandlerFactory implements FactoryBean<DaiVinchikDia
     private final UserTokenRepository tokenRepository;
     private final DaiVinchikMissedMessageService missedMessageService;
     private final DaiVinchikCaseMatcherService caseMatcher;
+    private final DaiVinchikProfileService profileCreatorService;
     private final Set<String> matchingWords;
 
 
@@ -37,10 +38,12 @@ public class DaiVinchikDialogHandlerFactory implements FactoryBean<DaiVinchikDia
     public DaiVinchikDialogHandlerFactory(UserTokenRepository tokenRepository,
                                           DaiVinchikMissedMessageService missedMessageService,
                                           DaiVinchikCaseMatcherService caseMatcher,
+                                          DaiVinchikProfileService profileCreatorService,
                                           @Qualifier("matchingWords") Set<String> matchingWords) {
         this.tokenRepository = tokenRepository;
         this.missedMessageService = missedMessageService;
         this.caseMatcher = caseMatcher;
+        this.profileCreatorService = profileCreatorService;
         this.matchingWords = matchingWords;
     }
 
@@ -59,7 +62,7 @@ public class DaiVinchikDialogHandlerFactory implements FactoryBean<DaiVinchikDia
         DaiVinchikDialogAnswerService answerService = new DaiVinchikDialogAnswerServiceImpl(
                 caseMatcher, messageService, matchingWords);
 
-        return new DaiVinchikDialogHandler(messageService, answerService, missedMessageService);
+        return new DaiVinchikDialogHandler(messageService, answerService, missedMessageService, profileCreatorService);
     }
 
     private DaiVinchikMessageService getDaiVinchikMessageService(String token) throws ClientException, ApiException {

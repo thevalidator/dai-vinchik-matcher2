@@ -26,10 +26,7 @@ import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.SendMessageResultR
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.Conversation;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keyboard.Keyboard;
 
-import javax.imageio.IIOException;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;

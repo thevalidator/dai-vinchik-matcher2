@@ -2,8 +2,11 @@ package ru.thevalidator.daivinchikmatcher2.service.daivinchik;
 
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.profile.DaiVinchikUserProfile;
 
-public interface ProfileGenerator {
+public interface DaiVinchikProfileGenerator {
 
-    public DaiVinchikUserProfile generateProfile();
+    public DaiVinchikUserProfile generateRandomProfile();
+    public DaiVinchikUserProfile generateRandomFemaleProfile();
+    public DaiVinchikUserProfile generateRandomMaleProfile();
+    public DaiVinchikUserProfile generateCustomProfile();
 
 }

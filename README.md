@@ -23,6 +23,6 @@
 - [x] fix stopping when on  start the last message is too many like
 - [ ] Make save and show stats if exception occurs
 - [ ] handle errors
-- [ ] feature 3
-- [ ] feature 3
+- [ ] move missed message service to message service
+- [ ] case when start filling profile and then got message finish with the previous answer to see who likes you 
 - [ ] feature 3

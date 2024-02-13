@@ -9,12 +9,17 @@ import ru.thevalidator.daivinchikmatcher2.exception.TooManyLikesForToday;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikDialogAnswerService;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikMessageService;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikMissedMessageService;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.DaiVinchikProfileService;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.CaseType;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.DaiVinchikDialogAnswer;
-import ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.Task;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.ProfileFillState;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.profile.DaiVinchikUserProfile;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.profile.ProfileInitResponse;
 import ru.thevalidator.daivinchikmatcher2.service.daivinchik.model.statisctic.Statistic;
+import ru.thevalidator.daivinchikmatcher2.service.daivinchik.task.Task;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.MessageAndKeyboard;
 import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.SendMessageResultResponse;
+import ru.thevalidator.daivinchikmatcher2.vk.dto.dupl.message.conversation.keyboard.KeyboardButtonAction;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -29,6 +34,7 @@ public class DaiVinchikDialogHandler implements Task {
     private final DaiVinchikMessageService messageService;
     private final DaiVinchikDialogAnswerService answerService;
     private final DaiVinchikMissedMessageService missedMessageService;
+    private final DaiVinchikProfileService profileService;
     private final Statistic stats;
     private volatile boolean isActive;
     private int counter = 0;
@@ -36,10 +42,12 @@ public class DaiVinchikDialogHandler implements Task {
 
     public DaiVinchikDialogHandler(DaiVinchikMessageService messageService,
                                    DaiVinchikDialogAnswerService answerService,
-                                   DaiVinchikMissedMessageService missedMessageService) {
+                                   DaiVinchikMissedMessageService missedMessageService,
+                                   DaiVinchikProfileService profileService) {
         this.messageService = messageService;
         this.answerService = answerService;
         this.missedMessageService = missedMessageService;
+        this.profileService = profileService;
         this.stats = new Statistic();
         this.random = new Random();
     }
@@ -50,9 +58,11 @@ public class DaiVinchikDialogHandler implements Task {
         LOG.debug("Start task");
         MessageAndKeyboard data;
         Integer lastConversationMessageId = messageService.getDaiVinchikLastConversationMessageId();
+
         if (lastConversationMessageId < 1) {
-            initDaiVinchikConversation();
+            lastConversationMessageId = initDaiVinchikConversation();
         }
+
         int messageDelta;
         while (isActive) {
             try {
@@ -70,11 +80,27 @@ public class DaiVinchikDialogHandler implements Task {
                 if (answer == null) {
                     isActive = false;
                     break;
+                } else if (answer.getType().equals(CaseType.PROFILE_FILLING)) {
+                    //ProfileInitResponse rs = profileService.fillRandomProfile(messageService, answerService);
+                    DaiVinchikUserProfile profile = profileService.getProfileGenerator().generateRandomProfile();
+                    ProfileInitResponse rs = profileService.fillProfile(profile, messageService, answerService);
+                    if (rs.getState().equals(ProfileFillState.PARTIAL)) {
+                        LOG.debug("Profile fill state: {}, need refill profile", rs.getState());
+                        setFillProfileState();
+                        rs = profileService.fillProfile(profile, messageService, answerService);
+                    }
+                    LOG.debug("Profile fill state: {}", rs.getState());
+                    lastConversationMessageId = rs.getLastConversationMessageId();
+                    TimeUnit.SECONDS.sleep(5);
+                    continue;
+                } else if (counter == 1 && answer.getType().equals(CaseType.PROFILE_LIKED_ME)) {
+                    int to = data.getMessage().getConversationMessageId();
+                    int from = to - 2;
+                    handleMissedMessages(from, to);
                 }
                 SendMessageResultResponse resultRs = messageService.sendAnswerMessage(answer);
-                //@TODO: check for response errors
                 lastConversationMessageId = resultRs.getConversationMessageId();
-                if (answer.getType().equals(CaseType.PROFILE) || answer.getType().equals(CaseType.QUESTION_AFTER_PROFILE)) {
+                if (answer.getType().equals(CaseType.PROFILE)) {
                     if (answer.getText().equals("1")) {
                         stats.increaseLikes();
                     } else {
@@ -91,7 +117,6 @@ public class DaiVinchikDialogHandler implements Task {
                 if (counter == 1) {
                     SendMessageResultResponse resultRs = messageService
                             .sendAnswerMessage(new DaiVinchikDialogAnswer("1", "1", CaseType.TOO_MANY_LIKES));
-                    //@TODO: check for response errors
                     lastConversationMessageId = resultRs.getConversationMessageId();
                 } else {
                     isActive = false;
@@ -116,9 +141,42 @@ public class DaiVinchikDialogHandler implements Task {
         stats.setFinishTime(Instant.now());
     }
 
-    private void initDaiVinchikConversation() {
-        //@TODO: check if profile creation state (to avoid one button answer collision)
-        throw new UnsupportedOperationException("Create profile feature is not supported yet");
+    private void setFillProfileState() throws InterruptedException {
+        TimeUnit.SECONDS.sleep(3);
+        MessageAndKeyboard data = messageService.getDaiVinchikLastMessageAndKeyboard();
+        DaiVinchikDialogAnswer answer = answerService.findAnswer(data);
+
+        if (!answer.getType().equals(CaseType.INACTIVE_MENU)) {
+            while (!answer.getType().equals(CaseType.PROFILE)) {
+                messageService.sendAnswerMessage(answer);
+                TimeUnit.SECONDS.sleep(5);
+                data = messageService.getDaiVinchikLastMessageAndKeyboard();
+                answer = answerService.findAnswer(data);
+            }
+
+            //go to sleep
+            KeyboardButtonAction btn = data.getKeyboard().getButtons().get(0).get(3).getAction();
+            messageService.sendAnswerMessage(
+                    new DaiVinchikDialogAnswer(btn.getLabel(), btn.getPayload(), CaseType.PROFILE));
+            TimeUnit.SECONDS.sleep(1);
+
+            //go to my profile
+            data = messageService.getDaiVinchikLastMessageAndKeyboard();
+            btn = data.getKeyboard().getButtons().get(0).get(1).getAction();
+            messageService.sendAnswerMessage(
+                    new DaiVinchikDialogAnswer(btn.getLabel(), btn.getPayload(), CaseType.SLEEPING));
+            TimeUnit.SECONDS.sleep(2);
+            data = messageService.getDaiVinchikLastMessageAndKeyboard();
+        }
+        //go to fill profile
+        KeyboardButtonAction btn = data.getKeyboard().getButtons().get(0).get(0).getAction();
+        messageService.sendAnswerMessage(
+                new DaiVinchikDialogAnswer(btn.getLabel(), btn.getPayload(), CaseType.INACTIVE_MENU));
+    }
+
+    private Integer initDaiVinchikConversation() {
+        var rs = messageService.sendAnswerMessage(new DaiVinchikDialogAnswer("старт", null, CaseType.UNKNOWN));
+        return rs.getConversationMessageId();
     }
 
     private void prepareBeforeStart() {
@@ -135,7 +193,7 @@ public class DaiVinchikDialogHandler implements Task {
 
     private void handleMissedMessages(int from, int to) {
         List<Integer> ids = new ArrayList<>();
-        for (int i = from; i < to; i++) { //@TODO: check if the last one not repeats
+        for (int i = from; i < to; i++) {
             ids.add(i);
         }
         var rs = messageService.getDaiVinchikMessagesByConversationId(ids);

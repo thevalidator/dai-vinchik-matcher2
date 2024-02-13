@@ -24,6 +24,16 @@ public class DaiVinchikCaseMatcherServiceImpl implements DaiVinchikCaseMatcherSe
             "(?<age>\\d{1,3},) " +
             "(?<city>[\\p{L}\\p{N}\\p{P}\\p{Z}$^+=|`~№]+)" +
             "(?<text>(((<br>)|\\n)*.*)*)";
+    private static final List<String> profileFillingPhrases = List.of(
+            "знакомлю красивых людей и нахожу друзей",
+            "задам тебе пару вопросов?",
+            "Сколько тебе лет?",
+            "определимся с полом",
+            "Кто тебе интересен?",
+            "Из какого ты города?",
+            "Как мне тебя называть?",
+            "Расскажи о себе и кого хочешь найти",
+            "Теперь пришли свое фото");
 
     //@TODO: move sympathy checking here or not ???
     public boolean isSympathyKeyboardPattern(com.vk.api.sdk.objects.messages.Keyboard keyboard) {
@@ -61,8 +71,8 @@ public class DaiVinchikCaseMatcherServiceImpl implements DaiVinchikCaseMatcherSe
             type = CaseType.WANT_TO_MEET;
         } else if (hasLikeFromSomeone(data)) {
             type = CaseType.SOMEBODY_LIKES_YOU;
-        } else if (isQuestionAfterProfile(data)) {
-            type = CaseType.QUESTION_AFTER_PROFILE;
+        } else if (isFinishPreviousQuestion(data)) {
+            type = CaseType.FINISH_PREVIOUS; // instead of QUESTION_AFTER_PROFILE
         } else if (isSleeping(data)) {
             type = CaseType.SLEEPING;
         } else if (isShowQuestion(data)) {
@@ -78,9 +88,11 @@ public class DaiVinchikCaseMatcherServiceImpl implements DaiVinchikCaseMatcherSe
         } else if (isNoSuchAnswer(data)) {
             type = CaseType.NO_SUCH_ANSWER;
         } else if (isQuestionAfterInactive(data)) {
-            type = CaseType.QUESTION_AFTER_INACTIVE;
+            type = CaseType.INACTIVE_MENU;
         } else if (isDisableProfileQuestion(data)) {
             type = CaseType.DISABLE_PROFILE_QUESTION;
+        } else if (isProfileFilling(data)) {
+            type = CaseType.PROFILE_FILLING;
         }
 
 
@@ -147,6 +159,12 @@ public class DaiVinchikCaseMatcherServiceImpl implements DaiVinchikCaseMatcherSe
     public boolean isOneButton(MessageAndKeyboard data) {
         Keyboard keyboard = data.getKeyboard();
         List<List<KeyboardButton>> buttonRows = keyboard.getButtons();
+        for (String phrase: profileFillingPhrases) {
+            if (data.getMessage().getText().contains(phrase)) {
+                return false;
+            }
+        }
+
         return buttonRows.size() == 1
                 && buttonRows.get(0).size() == 1;
                 //&& buttonRows.get(0).get(0).getAction().getType().equals(KeyboardButtonActionTextType.TEXT.getValue());
@@ -261,7 +279,7 @@ public class DaiVinchikCaseMatcherServiceImpl implements DaiVinchikCaseMatcherSe
                 && message.getText().contains("показать");//"Ты понравился 1 человеку, показать его?"
     }
 
-    private boolean isQuestionAfterProfile(MessageAndKeyboard data) {
+    private boolean isFinishPreviousQuestion(MessageAndKeyboard data) {
         Message message = data.getMessage();
         return message.getText().contains("Заканчивай с вопросом выше");
         //"Нашли кое-кого для тебя ;) Заканчивай с вопросом выше и увидишь кто это"
@@ -355,6 +373,19 @@ public class DaiVinchikCaseMatcherServiceImpl implements DaiVinchikCaseMatcherSe
                 && message.getText().contains("отключить анкету");
     }
 
+    private boolean isProfileFilling(MessageAndKeyboard data) {
+        Message message = data.getMessage();
+        Keyboard keyboard = data.getKeyboard();
+        boolean isProfileFilling = false;
+        for (String phrase: profileFillingPhrases) {
+            if (message.getText().contains(phrase) && keyboard.getButtons().get(0).size() != 4) {
+                isProfileFilling = true;
+                break;
+            }
+        }
+        return isProfileFilling;
+    }
+
     public boolean isProfileUrl(MessageAndKeyboard data) {
         Message message = data.getMessage();
 
@@ -387,12 +418,5 @@ public class DaiVinchikCaseMatcherServiceImpl implements DaiVinchikCaseMatcherSe
         //if (text.contains("Смотреть анкеты")) {}
         throw new UnsupportedOperationException("Not supported yet");
     }
-
-//    private boolean isProfileKeyboard(Keyboard keyboard) {
-//            List<KeyboardButton> buttons = keyboard.getButtons().get(0);
-//            return (keyboard.getButtons().size() == 1)
-//                    && KeyboardButtonColor.POSITIVE.getValue().equals(buttons.get(0).getColor())
-//                    && KeyboardButtonColor.DEFAULT.getValue().equals(buttons.get(3).getColor());
-//    }
 
 }
